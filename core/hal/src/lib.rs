@@ -1,9 +1,9 @@
 #![deny(unsafe_code)]
 
 pub mod block;
-pub mod tpm;
-pub mod power;
 pub mod ffi;
+pub mod power;
+pub mod tpm;
 
 use thiserror::Error;
 
