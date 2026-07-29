@@ -15,7 +15,7 @@ jobs:
     name: Format check
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check whitespace
         run: |
           git fetch origin main --depth=1
@@ -41,7 +41,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
@@ -68,7 +68,7 @@ jobs:
     name: Protobuf check
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
@@ -90,7 +90,7 @@ jobs:
     name: Build
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
@@ -113,7 +113,7 @@ jobs:
     name: Test
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
@@ -136,7 +136,7 @@ jobs:
     name: Security scan
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
@@ -168,7 +168,7 @@ jobs:
       actions: read
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
