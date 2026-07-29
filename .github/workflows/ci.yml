@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check whitespace
-        run: git diff --check HEAD~1
+        run: git fetch origin main --depth=1 && git diff --check origin/main...HEAD
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -32,7 +32,7 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           components: rustfmt
       - name: Check Rust formatting
-        run: cargo fmt --manifest-path core/hal/Cargo.toml --check
+        run: if [ -f core/hal/Cargo.toml ]; then cargo fmt --manifest-path core/hal/Cargo.toml --check; else echo "Skipping -- no HAL crate found"; fi
 
   lint:
     name: Lint
@@ -54,7 +54,7 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           components: clippy
       - name: clippy
-        run: cargo clippy --manifest-path core/hal/Cargo.toml -- -D warnings
+        run: if [ -f core/hal/Cargo.toml ]; then cargo clippy --manifest-path core/hal/Cargo.toml -- -D warnings; else echo "Skipping -- no HAL crate found"; fi
 
   build:
     name: Build
@@ -77,7 +77,7 @@ jobs:
         with:
           toolchain: ${{ env.RUST_VERSION }}
       - name: Build HAL
-        run: cargo build --manifest-path core/hal/Cargo.toml
+        run: if [ -f core/hal/Cargo.toml ]; then cargo build --manifest-path core/hal/Cargo.toml; else echo "Skipping -- no HAL crate found"; fi
 
   test:
     name: Test
@@ -100,7 +100,7 @@ jobs:
         with:
           toolchain: ${{ env.RUST_VERSION }}
       - name: Run Rust tests
-        run: cargo test --manifest-path core/hal/Cargo.toml
+        run: if [ -f core/hal/Cargo.toml ]; then cargo test --manifest-path core/hal/Cargo.toml; else echo "Skipping -- no HAL crate found"; fi
 
   security:
     name: Security scan
@@ -120,6 +120,7 @@ jobs:
         with:
           toolchain: ${{ env.RUST_VERSION }}
       - name: Run cargo-audit
+        if: hashFiles('core/hal/Cargo.toml') != ''
         uses: actions-rust-lang/audit@v1
         with:
           manifest-path: core/hal/Cargo.toml

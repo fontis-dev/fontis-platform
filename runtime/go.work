@@ -1,0 +1,13 @@
+go 1.23
+
+use (
+	./auth
+	./backup
+	./identity
+	./logging
+	./marketplace-client
+	./module-lifecycle
+	./networking
+	./storage
+	./updates
+)
