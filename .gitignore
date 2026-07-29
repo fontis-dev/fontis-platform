@@ -55,6 +55,7 @@ target/
 # Build artifacts
 build/
 out/
+*.exe
 *.o
 *.a
 *.so

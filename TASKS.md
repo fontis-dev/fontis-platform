@@ -4,13 +4,13 @@
 
 ### Build system and toolchain
 
-- [ ] Create Makefile with targets: build, fmt, lint, typecheck, test-unit, test-integration, security-scan, clean.
+- [x] Create Makefile with targets: build, fmt, lint, typecheck, test-unit, test-integration, security-scan, clean.
 - [ ] Set up Yocto layer structure for core OS image.
 - [ ] Configure Linux kernel with required drivers (storage, networking, TPM, UEFI) and security features (SELinux/AppArmor, integrity subsystem, dm-crypt, dm-verity).
 - [ ] Set up Rust toolchain and project structure for `core/hal/`.
-- [ ] Set up Go toolchain and project structure for `runtime/` services.
-- [ ] Create CI pipeline (`.github/workflows/ci.yml`) with build, lint, test jobs.
-- [ ] Configure Dependabot for Go modules, Rust crates, GitHub Actions.
+- [x] Set up Go toolchain and project structure for `runtime/` services.
+- [x] Create CI pipeline (`.github/workflows/ci.yml`) with build, lint, test jobs.
+- [x] Configure Dependabot for Go modules, Rust crates, GitHub Actions.
 
 ### Core OS boot chain
 
@@ -43,9 +43,9 @@
 - [x] Create SPEC.md with platform requirements.
 - [x] Create ROADMAP.md with phased roadmap.
 - [x] Create TASKS.md (this file).
-- [ ] Create docs/ARCHITECTURE.md.
-- [ ] Create docs/STANDARDS.md.
-- [ ] Create CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md.
+- [x] Create docs/ARCHITECTURE.md.
+- [x] Create docs/STANDARDS.md.
+- [x] Create CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md.
 
 ## Next phase: Identity and Auth
 
