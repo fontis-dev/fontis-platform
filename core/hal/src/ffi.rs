@@ -1,7 +1,7 @@
 #![allow(unsafe_code)]
 
 use crate::error::HalError;
-use std::ffi::{CStr, CString};
+use std::ffi::CString;
 use std::os::raw::c_char;
 
 pub type HalResult<T> = Result<T, HalError>;
@@ -28,16 +28,28 @@ fn to_ffi_result(res: HalResult<()>) -> HalFfiResult {
     }
 }
 
+/// # Safety
+///
+/// This function is safe to call from C as long as the caller does not
+/// hold any Rust references or mutable borrows across the call boundary.
 #[no_mangle]
 pub unsafe extern "C" fn hal_shutdown() -> HalFfiResult {
     to_ffi_result(crate::power::shutdown())
 }
 
+/// # Safety
+///
+/// This function is safe to call from C as long as the caller does not
+/// hold any Rust references or mutable borrows across the call boundary.
 #[no_mangle]
 pub unsafe extern "C" fn hal_reboot() -> HalFfiResult {
     to_ffi_result(crate::power::reboot())
 }
 
+/// # Safety
+///
+/// `ptr` must be a valid pointer returned by a prior `HalFfiResult` call,
+/// or null. Passing an arbitrary or already-freed pointer is undefined behavior.
 #[no_mangle]
 pub unsafe extern "C" fn hal_free_error_message(ptr: *mut c_char) {
     if !ptr.is_null() {
@@ -48,6 +60,7 @@ pub unsafe extern "C" fn hal_free_error_message(ptr: *mut c_char) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::ffi::CStr;
 
     #[test]
     fn test_shutdown_ffi_result_is_not_supported() {

@@ -131,10 +131,10 @@ jobs:
         with:
           toolchain: ${{ env.RUST_VERSION }}
       - name: Run cargo-audit
-        if: hashFiles('core/hal/Cargo.toml') != ''
+        if: hashFiles('core/hal/Cargo.lock') != ''
         uses: actions-rust-lang/audit@v1
         with:
-          manifest-path: core/hal/Cargo.toml
+          workingDirectory: core/hal
 
   codeql:
     name: CodeQL
