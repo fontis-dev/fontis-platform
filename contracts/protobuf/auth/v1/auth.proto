@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package fontis.auth.v1;
+
+option go_package = "github.com/fontis-dev/fontis-platform/runtime/auth/proto";
+
+import "google/protobuf/timestamp.proto";
+
+message Session {
+  string id = 1;
+  string profile_id = 2;
+  string token = 3;
+  string refresh_token = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message ApiToken {
+  string id = 1;
+  string profile_id = 2;
+  string name = 3;
+  string token_hash = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp expires_at = 6;
+}
+
+message AuthenticateRequest {
+  string profile_id = 1;
+  string password = 2;
+}
+
+message AuthenticateResponse {
+  Session session = 1;
+}
+
+message CreateSessionRequest {
+  string profile_id = 1;
+}
+
+message CreateSessionResponse {
+  Session session = 1;
+}
+
+message ValidateSessionRequest {
+  string token = 1;
+}
+
+message ValidateSessionResponse {
+  bool valid = 1;
+  string profile_id = 2;
+}
+
+message RevokeSessionRequest {
+  string session_id = 1;
+}
+
+message RevokeSessionResponse {}
+
+message RefreshSessionRequest {
+  string refresh_token = 1;
+}
+
+message RefreshSessionResponse {
+  Session session = 1;
+}
+
+message CreateApiTokenRequest {
+  string profile_id = 1;
+  string name = 2;
+}
+
+message CreateApiTokenResponse {
+  ApiToken token = 1;
+}
+
+message ValidateApiTokenRequest {
+  string token = 1;
+}
+
+message ValidateApiTokenResponse {
+  bool valid = 1;
+  string profile_id = 2;
+}
+
+message RevokeApiTokenRequest {
+  string token_id = 1;
+}
+
+message RevokeApiTokenResponse {}
+
+message ListApiTokensRequest {
+  string profile_id = 1;
+}
+
+message ListApiTokensResponse {
+  repeated ApiToken tokens = 1;
+}
+
+service AuthService {
+  rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
+  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
+  rpc ValidateSession(ValidateSessionRequest) returns (ValidateSessionResponse);
+  rpc RevokeSession(RevokeSessionRequest) returns (RevokeSessionResponse);
+  rpc RefreshSession(RefreshSessionRequest) returns (RefreshSessionResponse);
+  rpc CreateApiToken(CreateApiTokenRequest) returns (CreateApiTokenResponse);
+  rpc ValidateApiToken(ValidateApiTokenRequest) returns (ValidateApiTokenResponse);
+  rpc RevokeApiToken(RevokeApiTokenRequest) returns (RevokeApiTokenResponse);
+  rpc ListApiTokens(ListApiTokensRequest) returns (ListApiTokensResponse);
+}

@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package fontis.storage.v1;
+
+option go_package = "github.com/fontis-dev/fontis-platform/runtime/storage/proto";
+
+import "google/protobuf/timestamp.proto";
+
+message BlockDevice {
+  string path = 1;
+  string model = 2;
+  uint64 size_bytes = 3;
+  bool removable = 4;
+  bool encrypted = 5;
+}
+
+message Volume {
+  string id = 1;
+  string name = 2;
+  uint64 size_bytes = 3;
+  string mount_path = 4;
+  bool encrypted = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message ListDevicesRequest {}
+
+message ListDevicesResponse {
+  repeated BlockDevice devices = 1;
+}
+
+message CreateVolumeRequest {
+  string name = 1;
+  string device_path = 2;
+  uint64 size_bytes = 3;
+  bool encrypt = 4;
+}
+
+message CreateVolumeResponse {
+  Volume volume = 1;
+}
+
+message MountVolumeRequest {
+  string volume_id = 1;
+  string mount_path = 2;
+}
+
+message MountVolumeResponse {
+  Volume volume = 1;
+}
+
+message UnmountVolumeRequest {
+  string volume_id = 1;
+}
+
+message UnmountVolumeResponse {}
+
+message ListVolumesRequest {}
+
+message ListVolumesResponse {
+  repeated Volume volumes = 1;
+}
+
+message DeleteVolumeRequest {
+  string volume_id = 1;
+}
+
+message DeleteVolumeResponse {}
+
+message GetVolumeRequest {
+  string volume_id = 1;
+}
+
+message GetVolumeResponse {
+  Volume volume = 1;
+}
+
+service StorageService {
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
+  rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse);
+  rpc GetVolume(GetVolumeRequest) returns (GetVolumeResponse);
+  rpc MountVolume(MountVolumeRequest) returns (MountVolumeResponse);
+  rpc UnmountVolume(UnmountVolumeRequest) returns (UnmountVolumeResponse);
+  rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
+  rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse);
+}

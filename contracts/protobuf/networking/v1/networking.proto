@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package fontis.networking.v1;
+
+option go_package = "github.com/fontis-dev/fontis-platform/runtime/networking/proto";
+
+message NetworkInterface {
+  string name = 1;
+  string type = 2;
+  string mac_address = 3;
+  bool connected = 4;
+}
+
+message WiFiNetwork {
+  string ssid = 1;
+  int32 signal_strength = 2;
+  bool secured = 3;
+  string security_type = 4;
+}
+
+message ListInterfacesRequest {}
+
+message ListInterfacesResponse {
+  repeated NetworkInterface interfaces = 1;
+}
+
+message ScanWiFiNetworksRequest {}
+
+message ScanWiFiNetworksResponse {
+  repeated WiFiNetwork networks = 1;
+}
+
+message ConnectWiFiRequest {
+  string ssid = 1;
+  string password = 2;
+}
+
+message ConnectWiFiResponse {
+  bool success = 1;
+  string ip_address = 2;
+}
+
+message DisconnectWiFiRequest {
+  string ssid = 1;
+}
+
+message DisconnectWiFiResponse {}
+
+message GetConnectionStatusRequest {}
+
+message GetConnectionStatusResponse {
+  bool connected = 1;
+  string interface_name = 2;
+  string ip_address = 3;
+  string ssid = 4;
+}
+
+service NetworkingService {
+  rpc ListInterfaces(ListInterfacesRequest) returns (ListInterfacesResponse);
+  rpc ScanWiFiNetworks(ScanWiFiNetworksRequest) returns (ScanWiFiNetworksResponse);
+  rpc ConnectWiFi(ConnectWiFiRequest) returns (ConnectWiFiResponse);
+  rpc DisconnectWiFi(DisconnectWiFiRequest) returns (DisconnectWiFiResponse);
+  rpc GetConnectionStatus(GetConnectionStatusRequest) returns (GetConnectionStatusResponse);
+}
