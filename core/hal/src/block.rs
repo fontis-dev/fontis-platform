@@ -1,6 +1,6 @@
 use crate::{HalError, HalResult};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct BlockDeviceInfo {
     pub path: String,
     pub size_bytes: u64,

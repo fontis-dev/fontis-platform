@@ -1,5 +1,3 @@
-#![deny(unsafe_code)]
-
 pub mod block;
 pub mod ffi;
 pub mod power;

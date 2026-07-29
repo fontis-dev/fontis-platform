@@ -1,6 +1,6 @@
 use crate::{HalError, HalResult};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct PcrValue {
     pub index: u32,
     pub value: Vec<u8>,
