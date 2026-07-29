@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"crypto/tls"
-	"database/sql"
 	"fmt"
 	"log"
 	"net"
@@ -110,11 +109,4 @@ func LoadTLSConfig(cfg *config.Config) (*tls.Config, error) {
 	return tlsCfg, nil
 }
 
-func openDB(path string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite", path)
-	if err != nil {
-		return nil, fmt.Errorf("open database: %w", err)
-	}
-	db.SetMaxOpenConns(1)
-	return db, nil
-}
+

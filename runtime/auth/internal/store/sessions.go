@@ -5,9 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
-
-	pb "github.com/fontis-dev/fontis-platform/runtime/auth/proto"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Session struct {
@@ -147,13 +144,4 @@ func scanSession(row scanner) (*Session, error) {
 	}, nil
 }
 
-func sessionToProto(s *Session) *pb.Session {
-	return &pb.Session{
-		Id:           s.ID,
-		ProfileId:    s.ProfileID,
-		Token:        s.Token,
-		RefreshToken: s.RefreshToken,
-		ExpiresAt:    timestamppb.New(s.ExpiresAt),
-		CreatedAt:    timestamppb.New(s.CreatedAt),
-	}
-}
+

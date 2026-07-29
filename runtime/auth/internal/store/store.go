@@ -98,10 +98,6 @@ func hashPassword(password string) (string, error) {
 
 	hash := argon2.IDKey([]byte(password), salt, argonTime, argonMemory, argonThreads, argonKeyLen)
 
-	b := make([]byte, 0, len(salt)+len(hash))
-	b = append(b, salt...)
-	b = append(b, hash...)
-
 	return fmt.Sprintf("$argon2id$v=19$m=%d,t=%d,p=%d$%s$%s",
 		argonMemory, argonTime, argonThreads,
 		hex.EncodeToString(salt), hex.EncodeToString(hash)), nil

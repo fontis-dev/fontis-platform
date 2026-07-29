@@ -153,18 +153,4 @@ func (s *Store) ListAPITokens(ctx context.Context, profileID string) ([]*pb.ApiT
 	return tokens, nil
 }
 
-func apiTokenToProto(t *APIToken, rawToken string) *pb.ApiToken {
-	pb := &pb.ApiToken{
-		Id:         t.ID,
-		ProfileId:  t.ProfileID,
-		Name:       t.Name,
-		CreatedAt:  timestamppb.New(t.CreatedAt),
-	}
-	if rawToken != "" {
-		pb.TokenHash = rawToken
-	}
-	if t.ExpiresAt != nil {
-		pb.ExpiresAt = timestamppb.New(*t.ExpiresAt)
-	}
-	return pb
-}
+
