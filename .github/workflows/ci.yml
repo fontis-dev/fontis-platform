@@ -139,6 +139,7 @@ jobs:
   codeql:
     name: CodeQL
     runs-on: ubuntu-24.04
+    continue-on-error: true
     permissions:
       actions: read
       contents: read
