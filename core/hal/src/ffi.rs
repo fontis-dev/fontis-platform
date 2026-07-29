@@ -7,6 +7,9 @@ use crate::tpm::{DefaultTpmHal, TpmHal};
 static BLOCK_HAL: DefaultBlockDeviceHal = DefaultBlockDeviceHal;
 static TPM_HAL: DefaultTpmHal = DefaultTpmHal;
 
+/// # Safety
+///
+/// `result` must point to valid writable memory. `result_len` must point to a valid `usize`.
 #[no_mangle]
 pub unsafe extern "C" fn hal_block_enumerate(
     result: *mut *mut c_char,
@@ -42,6 +45,9 @@ pub extern "C" fn hal_tpm_is_present() -> i32 {
     }
 }
 
+/// # Safety
+///
+/// `result` must point to valid writable memory.
 #[no_mangle]
 pub unsafe extern "C" fn hal_tpm_read_pcr(index: u32, result: *mut *mut c_char) -> i32 {
     match TPM_HAL.read_pcr(index) {
@@ -63,6 +69,9 @@ pub unsafe extern "C" fn hal_tpm_read_pcr(index: u32, result: *mut *mut c_char) 
     }
 }
 
+/// # Safety
+///
+/// `s` must be a valid `CString` pointer previously returned by a HAL function, or null.
 #[no_mangle]
 pub unsafe extern "C" fn hal_free_string(s: *mut c_char) {
     if !s.is_null() {
