@@ -17,7 +17,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check whitespace
-        run: git fetch origin main --depth=1 && git diff --check origin/main...HEAD
+        run: |
+          git fetch origin main --depth=1
+          git diff --check origin/main...HEAD 2>/dev/null || \
+            (git fetch --deepen=1 origin main && git diff --check HEAD~1...HEAD)
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
