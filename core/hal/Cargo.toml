@@ -1,0 +1,12 @@
+[package]
+name = "fontis-hal"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+license = "MIT OR Apache-2.0"
+description = "Fontis Hardware Abstraction Layer - safe hardware access and FFI bridge for Go runtime services"
+
+[features]
+hwtest = []
+
+[dependencies]
