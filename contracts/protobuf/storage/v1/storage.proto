@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package fontis.storage.v1;
+
+option go_package = "github.com/fontis-dev/fontis-platform/runtime/storage/proto/v1;storagepb";
+
+service StorageService {
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
+  rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse);
+  rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse);
+  rpc MountVolume(MountVolumeRequest) returns (MountVolumeResponse);
+  rpc UnmountVolume(UnmountVolumeRequest) returns (UnmountVolumeResponse);
+  rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
+  rpc GetVolumeStatus(GetVolumeStatusRequest) returns (GetVolumeStatusResponse);
+  rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse);
+}
+
+message BlockDevice {
+  string path = 1;
+  uint64 size_bytes = 2;
+  string model = 3;
+  string serial = 4;
+  bool is_rotational = 5;
+}
+
+message Volume {
+  string id = 1;
+  string name = 2;
+  string device_path = 3;
+  uint64 size_bytes = 4;
+  bool encrypted = 5;
+  string filesystem = 6;
+  string mount_point = 7;
+  string state = 8;
+  string created_at = 9;
+}
+
+message Snapshot {
+  string id = 1;
+  string volume_id = 2;
+  string name = 3;
+  uint64 size_bytes = 4;
+  string created_at = 5;
+}
+
+message ListDevicesRequest {}
+
+message ListDevicesResponse {
+  repeated BlockDevice devices = 1;
+}
+
+message CreateVolumeRequest {
+  string name = 1;
+  string device_path = 2;
+  uint64 size_bytes = 3;
+  bool encrypted = 4;
+  string passphrase = 5;
+  string filesystem = 6;
+}
+
+message CreateVolumeResponse {
+  Volume volume = 1;
+}
+
+message DeleteVolumeRequest {
+  string id = 1;
+}
+
+message DeleteVolumeResponse {}
+
+message MountVolumeRequest {
+  string id = 1;
+  string mount_point = 2;
+}
+
+message MountVolumeResponse {
+  Volume volume = 1;
+}
+
+message UnmountVolumeRequest {
+  string id = 1;
+}
+
+message UnmountVolumeResponse {}
+
+message ListVolumesRequest {}
+
+message ListVolumesResponse {
+  repeated Volume volumes = 1;
+}
+
+message GetVolumeStatusRequest {
+  string id = 1;
+}
+
+message GetVolumeStatusResponse {
+  Volume volume = 1;
+  uint64 used_bytes = 2;
+  uint64 available_bytes = 3;
+}
+
+message CreateSnapshotRequest {
+  string volume_id = 1;
+  string name = 2;
+}
+
+message CreateSnapshotResponse {
+  Snapshot snapshot = 1;
+}

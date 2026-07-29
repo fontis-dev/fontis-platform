@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package fontis.identity.v1;
+
+option go_package = "github.com/fontis-dev/fontis-platform/runtime/identity/proto/v1;identitypb";
+
+service IdentityService {
+  rpc CreateHousehold(CreateHouseholdRequest) returns (CreateHouseholdResponse);
+  rpc GetHousehold(GetHouseholdRequest) returns (GetHouseholdResponse);
+  rpc UpdateHousehold(UpdateHouseholdRequest) returns (UpdateHouseholdResponse);
+  rpc DeleteHousehold(DeleteHouseholdRequest) returns (DeleteHouseholdResponse);
+  rpc ListHouseholds(ListHouseholdsRequest) returns (ListHouseholdsResponse);
+
+  rpc CreateProfile(CreateProfileRequest) returns (CreateProfileResponse);
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  rpc DeleteProfile(DeleteProfileRequest) returns (DeleteProfileResponse);
+  rpc ListProfiles(ListProfilesRequest) returns (ListProfilesResponse);
+}
+
+message Household {
+  string id = 1;
+  string name = 2;
+  string created_at = 3;
+  string updated_at = 4;
+}
+
+message Profile {
+  string id = 1;
+  string household_id = 2;
+  string display_name = 3;
+  string avatar_url = 4;
+  string role = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message CreateHouseholdRequest {
+  string name = 1;
+}
+
+message CreateHouseholdResponse {
+  Household household = 1;
+}
+
+message GetHouseholdRequest {
+  string id = 1;
+}
+
+message GetHouseholdResponse {
+  Household household = 1;
+}
+
+message UpdateHouseholdRequest {
+  string id = 1;
+  string name = 2;
+}
+
+message UpdateHouseholdResponse {
+  Household household = 1;
+}
+
+message DeleteHouseholdRequest {
+  string id = 1;
+}
+
+message DeleteHouseholdResponse {}
+
+message ListHouseholdsRequest {}
+
+message ListHouseholdsResponse {
+  repeated Household households = 1;
+}
+
+message CreateProfileRequest {
+  string household_id = 1;
+  string display_name = 2;
+  string role = 3;
+}
+
+message CreateProfileResponse {
+  Profile profile = 1;
+}
+
+message GetProfileRequest {
+  string id = 1;
+}
+
+message GetProfileResponse {
+  Profile profile = 1;
+}
+
+message UpdateProfileRequest {
+  string id = 1;
+  string display_name = 2;
+  string avatar_url = 3;
+  string role = 4;
+}
+
+message UpdateProfileResponse {
+  Profile profile = 1;
+}
+
+message DeleteProfileRequest {
+  string id = 1;
+}
+
+message DeleteProfileResponse {}
+
+message ListProfilesRequest {
+  string household_id = 1;
+}
+
+message ListProfilesResponse {
+  repeated Profile profiles = 1;
+}

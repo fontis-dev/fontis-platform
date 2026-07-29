@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package fontis.networking.v1;
+
+option go_package = "github.com/fontis-dev/fontis-platform/runtime/networking/proto/v1;networkingpb";
+
+service NetworkingService {
+  rpc ListInterfaces(ListInterfacesRequest) returns (ListInterfacesResponse);
+  rpc GetInterface(GetInterfaceRequest) returns (GetInterfaceResponse);
+  rpc SetInterfaceState(SetInterfaceStateRequest) returns (SetInterfaceStateResponse);
+
+  rpc ScanWifi(ScanWifiRequest) returns (ScanWifiResponse);
+  rpc ConnectWifi(ConnectWifiRequest) returns (ConnectWifiResponse);
+  rpc DisconnectWifi(DisconnectWifiRequest) returns (DisconnectWifiResponse);
+  rpc ListKnownNetworks(ListKnownNetworksRequest) returns (ListKnownNetworksResponse);
+  rpc ForgetNetwork(ForgetNetworkRequest) returns (ForgetNetworkResponse);
+
+  rpc GetIPAddress(GetIPAddressRequest) returns (GetIPAddressResponse);
+  rpc SetStaticIP(SetStaticIPRequest) returns (SetStaticIPResponse);
+  rpc EnableDHCP(EnableDHCPRequest) returns (EnableDHCPResponse);
+}
+
+message NetworkInterface {
+  string id = 1;
+  string name = 2;
+  string type = 3;
+  string mac_address = 4;
+  string state = 5;
+}
+
+message WifiNetwork {
+  string ssid = 1;
+  int32 signal_strength = 2;
+  string security_type = 3;
+  bool is_connected = 4;
+}
+
+message KnownNetwork {
+  string id = 1;
+  string ssid = 2;
+  string security_type = 3;
+  int32 priority = 4;
+  bool auto_connect = 5;
+}
+
+message ListInterfacesRequest {}
+
+message ListInterfacesResponse {
+  repeated NetworkInterface interfaces = 1;
+}
+
+message GetInterfaceRequest {
+  string id = 1;
+}
+
+message GetInterfaceResponse {
+  NetworkInterface interface = 1;
+}
+
+message SetInterfaceStateRequest {
+  string id = 1;
+  string state = 2;
+}
+
+message SetInterfaceStateResponse {}
+
+message ScanWifiRequest {}
+
+message ScanWifiResponse {
+  repeated WifiNetwork networks = 1;
+}
+
+message ConnectWifiRequest {
+  string ssid = 1;
+  string password = 2;
+  string security_type = 3;
+}
+
+message ConnectWifiResponse {
+  bool success = 1;
+}
+
+message DisconnectWifiRequest {
+  string ssid = 1;
+}
+
+message DisconnectWifiResponse {}
+
+message ListKnownNetworksRequest {}
+
+message ListKnownNetworksResponse {
+  repeated KnownNetwork networks = 1;
+}
+
+message ForgetNetworkRequest {
+  string id = 1;
+}
+
+message ForgetNetworkResponse {}
+
+message GetIPAddressRequest {
+  string interface_id = 1;
+}
+
+message GetIPAddressResponse {
+  string ipv4_address = 1;
+  string ipv6_address = 2;
+  string gateway = 3;
+  string dns_servers = 4;
+}
+
+message SetStaticIPRequest {
+  string interface_id = 1;
+  string ipv4_address = 2;
+  string netmask = 3;
+  string gateway = 4;
+  string dns_servers = 5;
+}
+
+message SetStaticIPResponse {}
+
+message EnableDHCPRequest {
+  string interface_id = 1;
+}
+
+message EnableDHCPResponse {}

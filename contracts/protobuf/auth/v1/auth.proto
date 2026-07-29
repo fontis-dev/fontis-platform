@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package fontis.auth.v1;
+
+option go_package = "github.com/fontis-dev/fontis-platform/runtime/auth/proto/v1;authpb";
+
+service AuthService {
+  rpc AuthenticatePassword(AuthenticatePasswordRequest) returns (AuthenticatePasswordResponse);
+  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
+  rpc ValidateSession(ValidateSessionRequest) returns (ValidateSessionResponse);
+  rpc RevokeSession(RevokeSessionRequest) returns (RevokeSessionResponse);
+  rpc CreateApiToken(CreateApiTokenRequest) returns (CreateApiTokenResponse);
+  rpc ValidateApiToken(ValidateApiTokenRequest) returns (ValidateApiTokenResponse);
+  rpc RevokeApiToken(RevokeApiTokenRequest) returns (RevokeApiTokenResponse);
+}
+
+message AuthenticatePasswordRequest {
+  string profile_id = 1;
+  string password = 2;
+}
+
+message AuthenticatePasswordResponse {
+  bool success = 1;
+}
+
+message CreateSessionRequest {
+  string profile_id = 1;
+}
+
+message CreateSessionResponse {
+  string session_token = 1;
+  string refresh_token = 2;
+  int64 expires_at = 3;
+}
+
+message ValidateSessionRequest {
+  string session_token = 1;
+}
+
+message ValidateSessionResponse {
+  bool valid = 1;
+  string profile_id = 2;
+}
+
+message RevokeSessionRequest {
+  string session_token = 1;
+}
+
+message RevokeSessionResponse {}
+
+message CreateApiTokenRequest {
+  string profile_id = 1;
+  string name = 2;
+  int64 expires_at = 3;
+}
+
+message CreateApiTokenResponse {
+  string token = 1;
+  string token_id = 2;
+}
+
+message ValidateApiTokenRequest {
+  string token = 1;
+}
+
+message ValidateApiTokenResponse {
+  bool valid = 1;
+  string profile_id = 2;
+  string token_id = 3;
+}
+
+message RevokeApiTokenRequest {
+  string token_id = 1;
+}
+
+message RevokeApiTokenResponse {}
