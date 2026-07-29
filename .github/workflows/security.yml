@@ -14,7 +14,7 @@ jobs:
     name: Secret scanning
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run Gitleaks
         uses: docker://zricethezav/gitleaks:v8.30.1
         with:
@@ -24,7 +24,7 @@ jobs:
     name: Trivy vulnerability scan
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run Trivy on filesystem
         uses: aquasecurity/trivy-action@master
         with:
