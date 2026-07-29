@@ -40,13 +40,15 @@
 
 ### Contracts and scaffolding
 
-- [ ] Define Protobuf schemas for identity service.
-- [ ] Define Protobuf schemas for auth service.
-- [ ] Set up Protobuf code generation in the build system.
-- [ ] Implement identity service skeleton (gRPC server, empty handlers).
-- [ ] Implement auth service skeleton (gRPC server, empty handlers).
-- [ ] Implement storage service skeleton (gRPC server, empty handlers).
-- [ ] Implement networking service skeleton (gRPC server, empty handlers).
+- [x] Define Protobuf schemas for identity service.
+- [x] Define Protobuf schemas for auth service.
+- [x] Define Protobuf schemas for storage service.
+- [x] Define Protobuf schemas for networking service.
+- [x] Set up Protobuf code generation in the build system.
+- [x] Implement identity service skeleton (gRPC server, empty handlers).
+- [x] Implement auth service skeleton (gRPC server, empty handlers).
+- [x] Implement storage service skeleton (gRPC server, empty handlers).
+- [x] Implement networking service skeleton (gRPC server, empty handlers).
 
 ### Testing
 
@@ -67,9 +69,9 @@
 
 ## Next phase: Identity and Auth
 
-- [ ] Implement identity service CRUD operations (households, profiles).
-- [ ] Implement auth service (password hashing, session management, API tokens).
-- [ ] Implement mTLS for inter-service communication.
+- [x] Implement identity service CRUD operations (households, profiles).
+- [x] Implement auth service (password hashing, session management, API tokens).
+- [x] Implement mTLS for inter-service communication.
 - [ ] Write integration tests for identity + auth flow.
 - [ ] Security review of auth implementation.
 
