@@ -13,6 +13,6 @@ type Server struct {
 
 func New(cfg *config.Config) *grpc.Server {
 	srv := grpc.NewServer()
-	s := &Server{cfg: cfg, grpc: srv}
+	_ = &Server{cfg: cfg, grpc: srv}
 	return srv
 }
