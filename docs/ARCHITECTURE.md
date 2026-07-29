@@ -12,62 +12,65 @@ fontis-platform is a purpose-built Linux-based operating system and runtime envi
 ## Architecture Diagram
 
 ```
-                    ┌──────────────────────────────────────┐
-                    │  Web UI (fontis-web)                  │
-                    │  Mobile App (fontis-mobile)           │
-                    └────────────┬─────────────────────────┘
-                                 │ HTTPS/TLS 1.3
-                                 ▼
-┌──────────────────────────────────────────────────────────────────┐
-│  API Gateway (envoy/traefik)                                      │
-│  - TLS termination                                                │
-│  - Authentication verification                                    │
-│  - Rate limiting                                                   │
-│  - Request routing to runtime services                            │
-└────┬──────────┬──────────┬──────────┬──────────┬─────────────────┘
-     │          │          │          │          │
-     ▼          ▼          ▼          ▼          ▼
-┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────────────┐
-│ Identity│ │  Auth   │ │ Storage │ │Network  │ │ Module Lifecycle│
-│ Service │ │ Service │ │ Service │ │ Service │ │ Service         │
-│ (Go)    │ │ (Go)    │ │ (Go)    │ │ (Go)    │ │ (Go)            │
-└────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘ └────────┬────────┘
-     │           │           │           │               │
-     └───────────┴───────────┴───────────┴───────────────┘
-                         │
-                    gRPC over local Unix sockets
-                    Mutual TLS
-                    Protobuf contracts
-                         │
-                         ▼
-┌──────────────────────────────────────────────────────────────────┐
-│  Logging Service (Go)      │   Update Service (Go)               │
-│  - Structured log collection│  - Update download and verification │
-│  - Log rotation and query   │  - A/B update and rollback         │
-│  - Module log aggregation  │  - Backup Service (Go)              │
-└────────────────────────────┘  - Scheduled backups                │
-                                - Cloud/network targets (opt-in)   │
-                                └─────────────────────────────────┘
-                         │
-                         ▼
-┌──────────────────────────────────────────────────────────────────┐
-│  Hardware Abstraction Layer (Rust)                               │
-│  core/hal/                                                        │
-│  - Disk/block device access                                       │
-│  - TPM operations                                                  │
-│  - GPIO/sensor access                                              │
-│  - Power management                                                │
-└───────────────────────────┬──────────────────────────────────────┘
-                            │
-                            ▼
-┌──────────────────────────────────────────────────────────────────┐
-│  Linux Kernel + Boot Chain                                       │
-│  - UEFI Secure Boot → signed bootloader → signed kernel          │
-│  - Measured boot (TPM PCRs)                                      │
-│  - Full disk encryption (LUKS + TPM)                              │
-│  - dm-verity for root filesystem verification                    │
-│  - SELinux/AppArmor for mandatory access control                 │
-└──────────────────────────────────────────────────────────────────┘
+                    ┌──────────────────────────────────────┐   ┌───────────────────────┐
+                    │  Web UI (fontis-web)                  │   │  Native Display        │
+                    │  Mobile App (fontis-mobile)           │   │  (HDMI/DP → TV/Monitor)│
+                    └────────────┬─────────────────────────┘   └───────────┬───────────┘
+                                 │ HTTPS/TLS 1.3                          │ Wayland protocol
+                                 ▼                                         ▼
+┌──────────────────────────────────────────────────────┐   ┌───────────────────────────┐
+│  API Gateway (envoy/traefik)                          │   │  Wayland Compositor       │
+│  - TLS termination                                    │   │  (wlroots-based)          │
+│  - Authentication verification                        │   │  - DRM/KMS output         │
+│  - Rate limiting                                       │   │  - GPU-accelerated render │
+│  - Request routing to runtime services                │   │  - Input routing          │
+└────┬──────────┬──────────┬──────────┬──────────┬──────┘   │  - Module surfaces        │
+     │          │          │          │          │          └───────────┬───────────────┘
+     ▼          ▼          ▼          ▼          ▼                      │ gRPC / IPC
+┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────────────┐   │
+│ Identity│ │  Auth   │ │ Storage │ │Network  │ │ Module Lifecycle│   │
+│ Service │ │ Service │ │ Service │ │ Service │ │ Service         │   │
+│ (Go)    │ │ (Go)    │ │ (Go)    │ │ (Go)    │ │ (Go)            │   │
+└────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘ └────────┬────────┘   │
+     │           │           │           │               │            │
+     └───────────┴───────────┴───────────┴───────────────┘────────────┘
+                          │
+                     gRPC over local Unix sockets
+                     Mutual TLS
+                     Protobuf contracts
+                          │
+                          ▼
+┌────────────────────────────────────────────────────────────────────────────────────┐
+│  Logging Service (Go)      │   Display Service (Go)     │  Update Service (Go)     │
+│  - Structured log collection│  - Compositor lifecycle    │  - Update download/verify│
+│  - Log rotation and query   │  - UI state coordinator    │  - A/B update and rollback│
+│  - Module log aggregation  │  - Input dispatch routing   │  - Backup Service (Go)   │
+└────────────────────────────┘  - System UI (setup overlay)│  - Scheduled backups     │
+                                └──────────────────────────┘  - Cloud/network targets │
+                                                              └───────────────────────┘
+                          │
+                          ▼
+┌────────────────────────────────────────────────────────────────────────────────────┐
+│  Hardware Abstraction Layer (Rust)                                                   │
+│  core/hal/                                                                            │
+│  - Disk/block device access                                                           │
+│  - TPM operations                                                                      │
+│  - GPIO/sensor access, IR receiver                                                    │
+│  - Power management                                                                    │
+│  - GPU/DRM access (via Mesa)                                                          │
+│  - Audio (ALSA/PipeWire)                                                              │
+└───────────────────────────────────────┬────────────────────────────────────────────────┘
+                                        │
+                                        ▼
+┌────────────────────────────────────────────────────────────────────────────────────┐
+│  Linux Kernel + Boot Chain                                                         │
+│  - UEFI Secure Boot → signed bootloader → signed kernel                            │
+│  - Measured boot (TPM PCRs)                                                        │
+│  - Full disk encryption (LUKS + TPM)                                                │
+│  - dm-verity for root filesystem verification                                      │
+│  - SELinux/AppArmor for mandatory access control                                   │
+│  - DRM/KMS, evdev, libinput, ALSA/snd-hda-intel drivers                           │
+└────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -99,6 +102,43 @@ The HAL is the only way runtime services access hardware. It is written in Rust 
 - Power management (shutdown, reboot, suspend, wake events).
 - Thermal and sensor monitoring.
 - LED indicators and physical button input.
+- GPU abstraction (DRM connector enumeration, mode setting, framebuffer allocation — consumed by compositor, not runtime services).
+- Audio abstraction (ALSA/PipeWire device enumeration, volume control, sink selection).
+
+---
+
+## Display and Input Stack
+
+The native display and input stack is a new subsystem that renders the Fontis user interface directly on the device's HDMI/DisplayPort output. It runs alongside the existing web/mobile UI paths and shares the same runtime services.
+
+### Layers
+
+1. **Linux Kernel** — DRM/KMS drivers (i915, amdgpu, etc.), evdev input subsystem, ALSA audio drivers.
+2. **Wayland Compositor** (wlroots-based) — manages display outputs (HDMI/DP), GPU-accelerated rendering via Mesa, input device capture via libinput, exposes Wayland protocol for client surfaces.
+3. **Display Service** (Go runtime service) — owns compositor lifecycle, coordinates UI state across modules, routes input events, renders system overlays (setup wizard, volume indicator, system menu).
+4. **Module UI** — each module that provides a native UI runs as a Wayland client connected to the compositor. Modules declare surfaces, receive input events, and render their content through the compositor. Module isolation: Wayland surfaces are sandboxed by the compositor (a misbehaving module cannot read or corrupt another module's surface).
+
+### Input Devices
+
+| Device | Connection | Protocol | Driver |
+|--------|-----------|----------|--------|
+| IR remote (included) | Built-in IR receiver | LIRC / input-event | kernel gpio-ir / mceusb |
+| Game controller | Bluetooth | HID over GATT | kernel hid-generic |
+| Keyboard | USB | HID | kernel usbhid |
+| Mouse | USB | HID | kernel usbhid |
+
+All input devices are captured by the Wayland compositor via libinput. The compositor routes input events to the display service, which dispatches them to the appropriate consumer (focused module, system UI, or a display service action).
+
+### Display Resolutions
+
+| Mode | Native resolution | Refresh | Notes |
+|------|------------------|---------|-------|
+| 720p | 1280×720 | 60 Hz | Minimum supported |
+| 1080p | 1920×1080 | 60 Hz | Target for TV output |
+| 1440p | 2560×1440 | 60 Hz | Monitor use |
+| 4K | 3840×2160 | 30/60 Hz | Max supported (HDMI 2.0) |
+
+Multi-monitor support is deferred to a future version.
 
 ---
 
@@ -167,7 +207,16 @@ The HAL is the only way runtime services access hardware. It is written in Rust 
 - **Backup content:** Profiles, settings, module data, selected storage volumes.
 - **Dependencies:** Storage service, networking service.
 
-#### Marketplace Client
+#### Display Service
+- **Owner:** tbd
+- **API:** Register module UI surface, request fullscreen/overlay, route input event, get display info (resolution, refresh rate), configure audio output.
+- **Compositor lifecycle:** Starts and manages the Wayland compositor process. Restarts compositor on crash. Handles mode setting.
+- **UI state coordinator:** Tracks which module has focus, manages overlay stack (system notifications over module UI), handles transitions (setup wizard → home screen → module).
+- **Input dispatch:** Routes input events (remote, gamepad, keyboard, mouse) to the focused module, system UI, or display service actions (e.g., long-pause → system menu).
+- **System UI:** The display service owns a system Wayland surface for overlays (volume indicator, input source indicator, system menu) and the setup wizard.
+- **Dependencies:** HAL (GPU/DRM via compositor, audio), compositor process, wayland-protocols.
+
+### Marketplace Client
 - **Owner:** tbd
 - **API:** Browse modules, search modules, get module details, download module, check for module updates.
 - **Graceful degradation:** If the marketplace is unavailable (no internet, opt-out), the API returns cached data and does not block any other functionality.
@@ -196,6 +245,13 @@ The HAL is the only way runtime services access hardware. It is written in Rust 
 3. Containers have read-only root filesystems.
 4. Module manifests declare required permissions. The user approves permissions during installation.
 5. Modules have no direct hardware access. All hardware access must go through the public runtime APIs.
+6. Modules that render a native UI connect to the Wayland compositor as sandboxed clients. The compositor enforces surface isolation: one module cannot read or draw on another module's surface. Module UI rendering is routed through the Wayland protocol, not through direct DRM access.
+
+### Display and Input Security
+1. The Wayland compositor runs as an unprivileged user with only the capability to access DRM devices (`CAP_SYS_ADMIN` for KMS is delegated through logind/seatd).
+2. Input devices are captured by the compositor. Runtime services and modules never read `/dev/input/*` directly.
+3. The display service communicates with the compositor over a dedicated Unix socket. Module management commands (surface register, input route) are authenticated by the compositor.
+4. The compositor isolates module Wayland surfaces: surface buffers are not shared between clients. Key event injection between surfaces is prevented.
 
 ### Data Security
 1. Full disk encryption with LUKS. Keys protected by TPM (production) or passphrase (development).
