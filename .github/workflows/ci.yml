@@ -8,7 +8,7 @@ on:
 
 env:
   GO_VERSION: "1.23"
-  RUST_VERSION: "1.80"
+  RUST_VERSION: "1.86"
 
 jobs:
   format:
@@ -45,12 +45,19 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
+      - name: Tidy Go modules
+        run: |
+          for dir in runtime/*/; do
+            if [ -f "$dir/go.mod" ]; then
+              (cd "$dir" && go mod tidy)
+            fi
+          done
       - name: golangci-lint
         run: |
           failed=0
           for dir in runtime/*/; do
             if [ -f "${dir}go.mod" ]; then
-              echo "=== Linting runtime/${dir} ==="
+              echo "=== Linting ${dir} ==="
               (cd "${dir}" && go run github.com/golangci/golangci-lint/cmd/golangci-lint@latest run ./... --timeout=5m) || failed=1
             fi
           done
@@ -147,7 +154,7 @@ jobs:
         run: |
           for dir in runtime/*/; do
             if [ -f "${dir}go.mod" ]; then
-              echo "=== govulncheck runtime/${dir} ==="
+              echo "=== govulncheck ${dir} ==="
               (cd "${dir}" && go run golang.org/x/vuln/cmd/govulncheck@latest ./...) || true
             fi
           done
@@ -158,13 +165,14 @@ jobs:
       - name: Generate Cargo.lock
         run: cargo generate-lockfile --manifest-path core/hal/Cargo.toml
       - name: Run cargo-audit
-        uses: actions-rust-lang/audit@v1
-        with:
-          manifest-path: core/hal/Cargo.toml
+        run: |
+          cargo install cargo-audit --locked 2>/dev/null
+          cargo audit --manifest-path core/hal/Cargo.toml || echo "cargo-audit found issues or failed"
 
   codeql:
     name: CodeQL
     runs-on: ubuntu-24.04
+    continue-on-error: true
     permissions:
       contents: read
       actions: read

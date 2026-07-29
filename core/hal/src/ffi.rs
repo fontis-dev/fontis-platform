@@ -1,9 +1,8 @@
-use std::ffi::{CStr, CString};
+use std::ffi::CString;
 use std::os::raw::c_char;
 
 use crate::block::{BlockDeviceHal, DefaultBlockDeviceHal};
 use crate::tpm::{DefaultTpmHal, TpmHal};
-use crate::HalResult;
 
 static BLOCK_HAL: DefaultBlockDeviceHal = DefaultBlockDeviceHal;
 static TPM_HAL: DefaultTpmHal = DefaultTpmHal;

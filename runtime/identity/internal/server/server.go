@@ -8,8 +8,8 @@ import (
 )
 
 type Server struct {
-	grpc *grpc.Server
-	cfg  *config.Config
+	grpc  *grpc.Server
+	cfg   *config.Config
 	store *store.Store
 }
 
