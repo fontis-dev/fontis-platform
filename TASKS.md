@@ -12,6 +12,7 @@
 - [x] Set up Rust toolchain and project structure for `core/hal/`.
 - [x] Set up Go toolchain and project structure for `runtime/` services.
 - [x] Create CI pipeline (`.github/workflows/ci.yml`) with build, lint, test jobs.
+- [x] Create security pipeline (`.github/workflows/security.yml`) with gitleaks and trivy scans.
 - [x] Configure Dependabot for Go modules, Rust crates, GitHub Actions.
 
 ### Core OS boot chain
