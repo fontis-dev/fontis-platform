@@ -168,7 +168,7 @@ jobs:
       - name: Run cargo-audit
         run: |
           cargo install cargo-audit --locked --version 0.22.1
-          cargo audit --manifest-path core/hal/Cargo.toml || echo "cargo-audit found issues (exit code: $?)"
+          cd core/hal && cargo audit || echo "cargo-audit found issues (exit code: $?)"
 
   codeql:
     name: CodeQL

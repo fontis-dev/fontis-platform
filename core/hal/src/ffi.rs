@@ -8,7 +8,10 @@ static BLOCK_HAL: DefaultBlockDeviceHal = DefaultBlockDeviceHal;
 static TPM_HAL: DefaultTpmHal = DefaultTpmHal;
 
 #[no_mangle]
-pub unsafe extern "C" fn hal_block_enumerate(result: *mut *mut c_char, result_len: *mut usize) -> i32 {
+pub unsafe extern "C" fn hal_block_enumerate(
+    result: *mut *mut c_char,
+    result_len: *mut usize,
+) -> i32 {
     match BLOCK_HAL.enumerate_devices() {
         Ok(devices) => {
             let json = serde_json::to_string(&devices).unwrap_or_default();
