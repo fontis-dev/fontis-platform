@@ -1,0 +1,16 @@
+# Default owners for everything
+* @fontis-dev/engineering-lead
+
+# Core OS layer - requires senior review
+/core/ @fontis-dev/engineering-lead
+
+# Security-sensitive services
+/runtime/auth/ @fontis-dev/engineering-lead
+/runtime/identity/ @fontis-dev/engineering-lead
+
+# Contracts - changes affect all consumers
+/contracts/ @fontis-dev/engineering-lead
+
+# Build and CI configuration
+/.github/ @fontis-dev/engineering-lead
+/Makefile @fontis-dev/engineering-lead

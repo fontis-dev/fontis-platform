@@ -1,0 +1,93 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100/
+.Trashes/
+.fseventsd/
+Thumbs.db
+desktop.ini
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+
+# Logs
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Python (used by build scripts)
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Go
+vendor/
+
+# Rust
+target/
+
+# Build artifacts
+build/
+out/
+*.o
+*.a
+*.so
+*.img
+*.iso
+*.qcow2
+
+# OS image output
+images/
+
+# Tool caches
+.cache/
+.parcel-cache/
+.turbo/
+
+# AI tool runtime state
+auth.json
+history.jsonl
+installation_id
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+sessions/
+archived_sessions/
+shell_snapshots/
+plugins/
+models_cache.json
+
+# Generated code (committed, but should not be manually edited)
+# Generated code is in runtime/*/proto/ and is checked in
+# but regenerated during build. Ignore transient files.
+*_pb.go
+
+# QEMU
+*.ovmf
+*.efi

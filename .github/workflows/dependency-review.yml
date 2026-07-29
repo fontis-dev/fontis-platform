@@ -1,0 +1,23 @@
+name: Dependency Review
+
+on:
+  pull_request:
+    paths:
+      - "runtime/*/go.mod"
+      - "runtime/*/go.sum"
+      - "core/hal/Cargo.toml"
+      - "core/hal/Cargo.lock"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: always
