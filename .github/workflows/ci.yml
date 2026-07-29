@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  GO_VERSION: "1.23"
+  GO_VERSION: "1.25"
   RUST_VERSION: "1.80"
 
 jobs:
@@ -63,6 +63,28 @@ jobs:
           components: clippy
       - name: clippy
         run: if [ -f core/hal/Cargo.toml ]; then cargo clippy --manifest-path core/hal/Cargo.toml -- -D warnings; else echo "Skipping -- no HAL crate found"; fi
+
+  protoc:
+    name: Protobuf check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          version: "25.x"
+      - name: Install protoc-gen-go
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.2
+      - name: Regenerate and check diff
+        run: |
+          make protoc-gen
+          git diff --exit-code || (echo "ERROR: Generated Protobuf code is out of date. Run 'make protoc-gen' and commit the changes."; exit 1)
 
   build:
     name: Build

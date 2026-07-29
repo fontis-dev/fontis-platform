@@ -1,4 +1,4 @@
-GO_VERSION ?= 1.23
+GO_VERSION ?= 1.25
 RUST_VERSION ?= 1.80
 HAL_MANIFEST := core/hal/Cargo.toml
 
@@ -139,12 +139,16 @@ security-scan:
 
 protoc-gen:
 	@echo "[protoc-gen] Regenerating Protobuf Go code..."
-	@for proto in contracts/protobuf/*/v1/*.proto; do \
-		if [ -f "$$proto" ]; then \
-			protoc --go_out=. --go_opt=paths=source_relative \
-				--go-grpc_out=. --go-grpc_opt=paths=source_relative \
+	@for proto_dir in contracts/protobuf/*/v1; do \
+		if [ -d "$$proto_dir" ]; then \
+			service=$$(basename $$(dirname "$$proto_dir")); \
+			output_dir=runtime/$$service/proto; \
+			mkdir -p "$$output_dir"; \
+			echo "  Generating $$service..."; \
+			protoc --go_out="$$output_dir" --go_opt=module=github.com/fontis-dev/fontis-platform/runtime/$$service \
+				--go-grpc_out="$$output_dir" --go-grpc_opt=module=github.com/fontis-dev/fontis-platform/runtime/$$service \
 				-I contracts/protobuf \
-				"$$proto"; \
+				"$$proto_dir"/*.proto; \
 		fi; \
 	done
 	@echo "[protoc-gen] Done"
