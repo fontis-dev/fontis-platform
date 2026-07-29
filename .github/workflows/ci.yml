@@ -16,8 +16,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Check whitespace
-        run: git diff --check HEAD~1
+        run: git diff --check ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -44,10 +46,13 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
-          working-directory: runtime
+        run: |
+          for dir in runtime/*/; do
+            if [ -f "${dir}go.mod" ]; then
+              echo "=== Linting runtime/${dir} ==="
+              (cd "${dir}" && go run github.com/golangci/golangci-lint/cmd/golangci-lint@latest run ./... --timeout=5m)
+            fi
+          done
       - name: Set up Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -65,6 +70,13 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
+      - name: Tidy Go modules
+        run: |
+          for dir in runtime/*/; do
+            if [ -f "$dir/go.mod" ]; then
+              (cd "$dir" && go mod tidy)
+            fi
+          done
       - name: Build runtime services
         run: |
           for dir in runtime/*/; do
@@ -76,6 +88,8 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ env.RUST_VERSION }}
+      - name: Generate Cargo.lock
+        run: cargo generate-lockfile --manifest-path core/hal/Cargo.toml
       - name: Build HAL
         run: cargo build --manifest-path core/hal/Cargo.toml
 
@@ -88,6 +102,13 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
+      - name: Tidy Go modules
+        run: |
+          for dir in runtime/*/; do
+            if [ -f "$dir/go.mod" ]; then
+              (cd "$dir" && go mod tidy)
+            fi
+          done
       - name: Run Go unit tests
         run: |
           for dir in runtime/*/; do
@@ -99,6 +120,8 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ env.RUST_VERSION }}
+      - name: Generate Cargo.lock
+        run: cargo generate-lockfile --manifest-path core/hal/Cargo.toml
       - name: Run Rust tests
         run: cargo test --manifest-path core/hal/Cargo.toml
 
@@ -111,6 +134,13 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
+      - name: Tidy Go modules
+        run: |
+          for dir in runtime/*/; do
+            if [ -f "$dir/go.mod" ]; then
+              (cd "$dir" && go mod tidy)
+            fi
+          done
       - name: Run govulncheck
         uses: golang/govulncheck-action@v1
         with:
@@ -119,6 +149,8 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ env.RUST_VERSION }}
+      - name: Generate Cargo.lock
+        run: cargo generate-lockfile --manifest-path core/hal/Cargo.toml
       - name: Run cargo-audit
         uses: actions-rust-lang/audit@v1
         with:
@@ -128,6 +160,7 @@ jobs:
     name: CodeQL
     runs-on: ubuntu-24.04
     permissions:
+      contents: read
       security-events: write
     steps:
       - uses: actions/checkout@v4
