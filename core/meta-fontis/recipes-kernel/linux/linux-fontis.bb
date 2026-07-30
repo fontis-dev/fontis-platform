@@ -7,6 +7,8 @@ SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch
 
 require recipes-kernel/linux/linux-yocto.inc
 
+inherit sign-images
+
 KCONFIG_MODE = "--alldefconfig"
 
 SRC_URI += "file://fontis.cfg \
@@ -17,3 +19,11 @@ SRC_URI += "file://fontis.cfg \
             "
 
 COMPATIBLE_MACHINE = "fontis-dev"
+
+# Sign the kernel image (EFI stub) for UEFI Secure Boot
+do_deploy:append() {
+    kernel="${DEPLOYDIR}/${KERNEL_IMAGETYPE}"
+    if [ -f "$kernel" ]; then
+        sign_efi "$kernel"
+    fi
+}
