@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	_ "modernc.org/sqlite"
 
@@ -69,6 +70,7 @@ func newAuthTestServer(t *testing.T) (pb.AuthServiceClient, *store.Store, func()
 	return client, st, func() {
 		conn.Close()
 		srv.Shutdown(ctx)
+		st.Close()
 		os.Remove(socketPath)
 	}
 }
@@ -76,7 +78,8 @@ func newAuthTestServer(t *testing.T) (pb.AuthServiceClient, *store.Store, func()
 func TestAuthIntegration_SessionLifecycle(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	sess, err := client.CreateSession(ctx, &pb.CreateSessionRequest{ProfileId: "profile-1"})
 	if err != nil {
@@ -120,7 +123,8 @@ func TestAuthIntegration_SessionLifecycle(t *testing.T) {
 func TestAuthIntegration_SessionRefresh(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	sess, err := client.CreateSession(ctx, &pb.CreateSessionRequest{ProfileId: "profile-1"})
 	if err != nil {
@@ -160,7 +164,8 @@ func TestAuthIntegration_SessionRefresh(t *testing.T) {
 func TestAuthIntegration_Authenticate(t *testing.T) {
 	client, st, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	if err := st.SetPassword(ctx, "profile-1", "correct-password"); err != nil {
 		t.Fatalf("SetPassword: %v", err)
@@ -184,7 +189,8 @@ func TestAuthIntegration_Authenticate(t *testing.T) {
 func TestAuthIntegration_AuthenticateInvalidPassword(t *testing.T) {
 	client, st, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	if err := st.SetPassword(ctx, "profile-1", "correct-password"); err != nil {
 		t.Fatalf("SetPassword: %v", err)
@@ -205,7 +211,8 @@ func TestAuthIntegration_AuthenticateInvalidPassword(t *testing.T) {
 func TestAuthIntegration_APITokenLifecycle(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	tok, err := client.CreateApiToken(ctx, &pb.CreateApiTokenRequest{
 		ProfileId: "profile-1",
@@ -253,7 +260,8 @@ func TestAuthIntegration_APITokenLifecycle(t *testing.T) {
 func TestAuthIntegration_ListAPITokens(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	_, err := client.CreateApiToken(ctx, &pb.CreateApiTokenRequest{
 		ProfileId: "profile-1",
@@ -288,7 +296,8 @@ func TestAuthIntegration_ListAPITokens(t *testing.T) {
 func TestAuthIntegration_ValidateInvalidSession(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	valid, err := client.ValidateSession(ctx, &pb.ValidateSessionRequest{
 		Token: "nonexistent-token",
@@ -304,7 +313,8 @@ func TestAuthIntegration_ValidateInvalidSession(t *testing.T) {
 func TestAuthIntegration_ValidateInvalidAPIToken(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	valid, err := client.ValidateApiToken(ctx, &pb.ValidateApiTokenRequest{
 		Token: "invalid-token",
@@ -320,7 +330,8 @@ func TestAuthIntegration_ValidateInvalidAPIToken(t *testing.T) {
 func TestAuthIntegration_MissingFields(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	_, err := client.CreateSession(ctx, &pb.CreateSessionRequest{ProfileId: ""})
 	if err == nil {
@@ -350,7 +361,8 @@ func TestAuthIntegration_MissingFields(t *testing.T) {
 func TestAuthIntegration_RefreshInvalidToken(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	_, err := client.RefreshSession(ctx, &pb.RefreshSessionRequest{RefreshToken: "invalid"})
 	if err == nil {
@@ -364,7 +376,8 @@ func TestAuthIntegration_RefreshInvalidToken(t *testing.T) {
 func TestAuthIntegration_AuthenticateNonexistentProfile(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	_, err := client.Authenticate(ctx, &pb.AuthenticateRequest{
 		ProfileId: "nonexistent",
@@ -381,7 +394,8 @@ func TestAuthIntegration_AuthenticateNonexistentProfile(t *testing.T) {
 func TestAuthIntegration_RevokeNonexistent(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	_, err := client.RevokeSession(ctx, &pb.RevokeSessionRequest{SessionId: "nonexistent"})
 	if err != nil {

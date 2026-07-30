@@ -21,7 +21,13 @@ func (s *Server) Authenticate(ctx context.Context, req *pb.AuthenticateRequest) 
 	}
 
 	ok, err := s.store.VerifyPassword(ctx, req.ProfileId, req.Password)
-	if err != nil || !ok {
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Error(codes.PermissionDenied, "invalid credentials")
+		}
+		return nil, status.Errorf(codes.Internal, "verify password: %v", err)
+	}
+	if !ok {
 		return nil, status.Error(codes.PermissionDenied, "invalid credentials")
 	}
 
