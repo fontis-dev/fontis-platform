@@ -72,8 +72,8 @@
 - [x] Implement identity service CRUD operations (households, profiles).
 - [x] Implement auth service (password hashing, session management, API tokens).
 - [x] Implement mTLS for inter-service communication.
-- [ ] Write integration tests for identity + auth flow.
-- [ ] Security review of auth implementation.
+- [x] Write integration tests for identity + auth flow.
+- [x] Security review of auth implementation.
 
 ## Phase 3: Display and Audio
 
