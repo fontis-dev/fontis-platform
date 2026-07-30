@@ -1,12 +1,8 @@
 # Boot Chain
 
-This directory contains boot chain configuration, initramfs scripts,
-and secure boot documentation.
+This directory contains conceptual documentation for the boot chain.
 
-- `initramfs/` - Initramfs scripts and configuration
-- `secure-boot/` - UEFI Secure Boot key management and signing scripts
-- `systemd-boot/` - Bootloader configuration
-
-Source of truth for boot recipes:
+Source-of-truth recipes live under core/meta-fontis/:
     core/meta-fontis/recipes-bsp/systemd-boot/
     core/meta-fontis/recipes-core/initrdscripts/fontis-initramfs/
+    core/meta-fontis/recipes-security/integrity/
