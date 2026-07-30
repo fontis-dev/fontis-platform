@@ -3,7 +3,7 @@ LINUX_VERSION_EXTENSION = "-fontis"
 
 SRCREV = "v6.6.62"
 
-SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch=linux-${LINUX_VERSION};protocol=https"
+SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch=linux-6.6.y;protocol=https"
 
 require recipes-kernel/linux/linux-yocto.inc
 
