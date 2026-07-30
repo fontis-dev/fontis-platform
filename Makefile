@@ -2,8 +2,8 @@ GO_VERSION ?= 1.25
 RUST_VERSION ?= 1.80
 HAL_MANIFEST := core/hal/Cargo.toml
 
-.PHONY: all build build-runtime build-hal build-image fmt lint typecheck
-.PHONY: test-unit test-integration test-hal security-scan clean qemu qemu-direct qemu-secureboot protoc-gen
+.PHONY: all build build-runtime build-hal fmt lint typecheck
+.PHONY: test-unit test-integration test-hal security-scan clean qemu qemu-direct qemu-secureboot protoc-gen build-image
 
 all: build
 

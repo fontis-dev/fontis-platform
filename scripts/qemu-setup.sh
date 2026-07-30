@@ -85,16 +85,19 @@ SECURE_BOOT="${SECURE_BOOT:-false}"
 SECURE_BOOT_KEYS="${SECURE_BOOT_KEYS:-$HOME/.cache/fontis/secure-boot-keys}"
 
 if [ "$SECURE_BOOT" = "true" ]; then
-    if [ ! -f "$SECURE_BOOT_KEYS/db.key" ]; then
-        if [ -f "$PROJECT_DIR/core/boot/secure-boot/gen-keys.sh" ]; then
-            echo ""
-            echo "Secure Boot keys not found. Generating development keys..."
-            mkdir -p "$SECURE_BOOT_KEYS"
-            "$PROJECT_DIR/core/boot/secure-boot/gen-keys.sh" "$SECURE_BOOT_KEYS"
-        fi
-    else
+    if [ -f "$SECURE_BOOT_KEYS/db.key" ] && [ -f "$SECURE_BOOT_KEYS/db.crt" ]; then
         echo ""
         echo "Secure Boot keys: $SECURE_BOOT_KEYS (existing)"
+    elif [ -f "$PROJECT_DIR/core/boot/secure-boot/gen-keys.sh" ]; then
+        echo ""
+        echo "Secure Boot keys not found. Generating development keys..."
+        mkdir -p "$SECURE_BOOT_KEYS"
+        "$PROJECT_DIR/core/boot/secure-boot/gen-keys.sh" "$SECURE_BOOT_KEYS"
+    else
+        echo ""
+        echo "ERROR: Secure Boot key generator not found at $PROJECT_DIR/core/boot/secure-boot/gen-keys.sh"
+        echo "Cannot generate required keys for --secure-boot mode."
+        exit 1
     fi
 fi
 
