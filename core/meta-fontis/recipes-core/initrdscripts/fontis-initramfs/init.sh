@@ -19,7 +19,10 @@ ROOTHASH=$(sed -n 's/.*roothash=\([^ ]*\).*/\1/p' /proc/cmdline)
 # TPM PCR extend for measured boot: measure kernel cmdline (includes roothash)
 if [ -c /dev/tpm0 ]; then
     CMDLINE_HASH=$(cat /proc/cmdline | sha256sum | cut -d' ' -f1)
-    tpm2_pcrextend 10:sha256="$CMDLINE_HASH"
+    tpm2_pcrextend 10:sha256="$CMDLINE_HASH" || {
+        echo "ERROR: tpm2_pcrextend failed, measured boot compromised"
+        exec /bin/sh
+    }
 fi
 
 # Unlock root partition (LUKS with TPM sealing)
@@ -28,14 +31,15 @@ VERITY_DEV="/dev/disk/by-partlabel/verity"
 LUKS_KEY_FILE=""
 
 if [ -b "$CRYPTROOT_DEV" ]; then
+    umask 077
     LUKS_KEY_FILE=$(mktemp -t luks-key.XXXXXXXX) || exit 1
     trap 'rm -f "$LUKS_KEY_FILE"' EXIT
     tpm2_unseal -c 0x81000000 -p 0 > "$LUKS_KEY_FILE" 2>/dev/null || true
     if [ -s "$LUKS_KEY_FILE" ]; then
         cryptsetup luksOpen --key-file="$LUKS_KEY_FILE" "$CRYPTROOT_DEV" cryptroot
     else
-        echo "WARNING: TPM unseal failed; falling back to recovery passphrase"
-        cryptsetup luksOpen "$CRYPTROOT_DEV" cryptroot
+        echo "ERROR: TPM unseal failed, cannot unlock root unattended"
+        exec /bin/sh
     fi
 fi
 
@@ -46,7 +50,10 @@ fi
 
 # Mount verified root filesystem
 if [ -b /dev/mapper/verity-root ]; then
-    mount -o ro /dev/mapper/verity-root /root
+    mount -o ro /dev/mapper/verity-root /root || {
+        echo "ERROR: failed to mount verity-root"
+        exec /bin/sh
+    }
 else
     echo "ERROR: verity-root device not available, dropping to recovery shell"
     exec /bin/sh
@@ -54,6 +61,7 @@ fi
 
 # Clean up
 udevadm settle
+rm -f "$LUKS_KEY_FILE"
 
 # Switch to real root
 exec switch_root /root /sbin/init
