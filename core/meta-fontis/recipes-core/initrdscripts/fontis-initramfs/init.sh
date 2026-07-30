@@ -13,6 +13,7 @@ mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 mount -t devtmpfs devtmpfs /dev
 mount -t tmpfs tmpfs /var
+mkdir -p /var/log
 
 echo "Fontis initramfs: starting boot sequence"
 
@@ -112,6 +113,9 @@ if [ -c "$TPM_DEV" ]; then
     tpm2_pcrread sha256:0,4,8,10,11 2>/dev/null > /var/log/tpm_initial_pcrs.txt || true
 fi
 
+# Wait for TPM before first PCR measurement
+wait_for_tpm || true
+
 # Stage 1: measure kernel version into PCR 10
 KERNEL_INFO=$(cat /proc/version 2>/dev/null || echo "unknown")
 pcr_extend_and_log 10 "KERNEL_VERSION" "kernel version" "$KERNEL_INFO"
@@ -119,8 +123,6 @@ pcr_extend_and_log 10 "KERNEL_VERSION" "kernel version" "$KERNEL_INFO"
 # Stage 2: measure kernel cmdline into PCR 10
 CMDLINE=$(cat /proc/cmdline)
 pcr_extend_and_log 10 "CMDLINE" "kernel command line" "$CMDLINE"
-
-wait_for_tpm
 
 update_boot_counter
 

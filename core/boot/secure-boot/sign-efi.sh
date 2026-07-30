@@ -28,7 +28,12 @@ fi
 
 # Check if already signed
 if sbverify --cert "$KEYDIR/db.crt" "$INPUT" 2>/dev/null; then
-    echo "Already signed with this certificate, skipping."
+    if [ "$INPUT" != "$OUTPUT" ]; then
+        cp "$INPUT" "$OUTPUT"
+        echo "Already signed, copied $INPUT -> $OUTPUT"
+    else
+        echo "Already signed with this certificate, skipping."
+    fi
     exit 0
 fi
 

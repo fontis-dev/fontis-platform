@@ -28,9 +28,10 @@ cert-to-efi-sig-list -g "$(uuidgen)" "$KEYDIR/KEK.crt" "$KEYDIR/KEK.esl"
 cert-to-efi-sig-list -g "$(uuidgen)" "$KEYDIR/db.crt" "$KEYDIR/db.esl"
 
 # Create authenticated EFI variable payloads for enrollment
+# PK is self-signed. KEK is signed by PK. db is signed by KEK.
 sign-efi-sig-list -k "$KEYDIR/PK.key" -c "$KEYDIR/PK.crt" PK "$KEYDIR/PK.esl" "$KEYDIR/PK.auth"
-sign-efi-sig-list -k "$KEYDIR/KEK.key" -c "$KEYDIR/KEK.crt" KEK "$KEYDIR/KEK.esl" "$KEYDIR/KEK.auth"
-sign-efi-sig-list -k "$KEYDIR/db.key" -c "$KEYDIR/db.crt" db "$KEYDIR/db.esl" "$KEYDIR/db.auth"
+sign-efi-sig-list -k "$KEYDIR/PK.key" -c "$KEYDIR/PK.crt" KEK "$KEYDIR/KEK.esl" "$KEYDIR/KEK.auth"
+sign-efi-sig-list -k "$KEYDIR/KEK.key" -c "$KEYDIR/KEK.crt" db "$KEYDIR/db.esl" "$KEYDIR/db.auth"
 
 echo "Keys generated successfully."
 echo "  PK:  $KEYDIR/PK.key, $KEYDIR/PK.crt"
