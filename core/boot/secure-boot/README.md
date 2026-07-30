@@ -4,7 +4,7 @@ This directory contains the UEFI Secure Boot infrastructure for the Fontis devic
 
 ## Key hierarchy
 
-```
+```text
 PK (Platform Key)          — top-level key, signs KEK updates
  └── KEK (Key Exchange Key) — signs db/dbx updates
       └── db (Signature Database) — signs authorized EFI binaries
@@ -15,15 +15,19 @@ PK (Platform Key)          — top-level key, signs KEK updates
 ### Generate development keys
 
 ```bash
-./gen-keys.sh ./keys
+./gen-keys.sh
 ```
 
-This creates `PK`, `KEK`, and `db` key pairs, certificates, and enrollment files in the specified directory.
+This creates `PK`, `KEK`, and `db` key pairs, certificates, and enrollment files in `~/.config/fontis/secure-boot-keys/` by default. Pass a custom directory to override:
+
+```bash
+./gen-keys.sh /path/to/keys
+```
 
 ### Sign an EFI binary
 
 ```bash
-./sign-efi.sh ./keys input.efi signed.efi
+./sign-efi.sh ~/.config/fontis/secure-boot-keys input.efi signed.efi
 ```
 
 ### Enroll keys on a device
@@ -42,8 +46,8 @@ The build system (meta-fontis layer) automatically signs the bootloader and kern
 
 | | Development | Production |
 |---|---|---|
-| Key generation | `gen-keys.sh` (in-repo) | Hardware Security Module (HSM) |
-| Key storage | `./keys/` in repo | Offline, air-gapped |
+| Key generation | `gen-keys.sh` (default: `~/.config/fontis/secure-boot-keys/`) | Hardware Security Module (HSM) |
+| Key storage | `~/.config/fontis/secure-boot-keys/` | Offline, air-gapped |
 | Certificate | Self-signed, 10-year | CA-issued, hardware-backed |
 | Signing | Done by build system | Done in secure build environment |
 | Enrollment | Manual via UEFI menu | Factory-enrolled |

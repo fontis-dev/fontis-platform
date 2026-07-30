@@ -13,7 +13,9 @@
 
 DEPENDS:append = " sbsigntool-native"
 
-# Default development key path — override in machine config for production
+# Default development key path — override in machine config for production.
+# Keys should live outside the repository (see core/boot/secure-boot/gen-keys.sh).
+# For CI or automated builds, set SECURE_BOOT_KEY_DIR to the key location.
 SECURE_BOOT_KEY_DIR ??= "${LAYERDIR}/../../core/boot/secure-boot/keys"
 
 # Sign an EFI binary with the Secure Boot db key.
@@ -29,9 +31,10 @@ sign_efi() {
 
     if [ -f "$keydir/db.key" ] && [ -f "$keydir/db.crt" ]; then
         sbsign --key "$keydir/db.key" --cert "$keydir/db.crt" --output "$bin" "$bin"
-        bbnote "Secure Boot: signed $bin"
+        bbnote "Secure Boot: signed $bin with key $keydir/db.key"
     else
-        bbwarn "Secure Boot keys not found at $keydir, skipping signing of $bin"
+        bberror "Secure Boot keys not found at $keydir. Set SECURE_BOOT_KEY_DIR or generate keys with core/boot/secure-boot/gen-keys.sh"
+        return 1
     fi
 }
 
@@ -42,8 +45,8 @@ verify_signed_efi() {
     bin="$1"
 
     if [ ! -f "$keydir/db.crt" ]; then
-        bbwarn "verify_signed_efi: db.crt not found at $keydir, skipping verification"
-        return 0
+        bberror "verify_signed_efi: db.crt not found at $keydir"
+        return 1
     fi
 
     sbverify --cert "$keydir/db.crt" "$bin" 2>/dev/null

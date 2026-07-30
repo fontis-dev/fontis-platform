@@ -3,7 +3,7 @@
 # Usage: ./gen-keys.sh [output-dir]
 set -euo pipefail
 
-KEYDIR="${1:-$(dirname "$0")/keys}"
+KEYDIR="${1:-$HOME/.config/fontis/secure-boot-keys}"
 echo "Generating UEFI Secure Boot keys in: $KEYDIR"
 mkdir -p "$KEYDIR"
 
