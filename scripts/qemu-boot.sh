@@ -152,7 +152,7 @@ fi
 
 # --- Build QEMU arguments ---
 QEMU_ARGS=(
-    -machine q35,accel="$ACCEL"
+    -machine q35,accel="$ACCEL",smm=on
     -cpu max
     -smp "$SMP"
     -m "$MEMORY"
@@ -211,6 +211,15 @@ if [ "$USE_TPM" = true ]; then
 
         echo "swtpm started (socket: $SWTPM_SOCKET, pid: $(cat "$SWTPM_PID_FILE"))"
 
+        # Ensure swtpm is cleaned up on exit (normal or abnormal)
+        cleanup_swtpm() {
+            if [ -f "$SWTPM_PID_FILE" ]; then
+                kill "$(cat "$SWTPM_PID_FILE")" 2>/dev/null || true
+                rm -f "$SWTPM_PID_FILE" "$SWTPM_SOCKET"
+            fi
+        }
+        trap cleanup_swtpm EXIT
+
         QEMU_ARGS+=(
             -chardev socket,id=chrtpm,path="$SWTPM_SOCKET"
             -tpmdev emulator,id=tpm0,chardev=chrtpm
@@ -222,14 +231,9 @@ fi
 # --- Secure Boot ---
 if [ "$SECURE_BOOT" = true ]; then
     if [ -f "$SECURE_BOOT_KEYS/db.key" ] && [ -f "$SECURE_BOOT_KEYS/db.crt" ]; then
-        # For OVMF with Secure Boot, we need to enroll the keys.
-        # This is done by installing the keys into the OVMF vars file
-        # before boot, or by using EnrollDefaultKeys.efi.
         echo "Secure Boot enabled (keys: $SECURE_BOOT_KEYS)"
         echo "NOTE: Key enrollment must be performed manually in the UEFI menu"
         echo "      or by pre-configuring OVMF_VARS with enrolled keys."
-        # OVMF with SMM and Secure Boot requires SMM enabled
-        QEMU_ARGS+=(-machine smm=on)
     else
         echo "Warning: Secure Boot keys not found, booting without Secure Boot"
         SECURE_BOOT=false
@@ -249,11 +253,4 @@ qemu-system-x86_64 "${QEMU_ARGS[@]}"
 EXIT_CODE=$?
 echo ""
 echo "QEMU exited with code $EXIT_CODE"
-
-# Clean up swtpm
-if [ "$USE_TPM" = true ] && [ -f "$SWTPM_PID_FILE" ]; then
-    kill "$(cat "$SWTPM_PID_FILE")" 2>/dev/null || true
-    rm -f "$SWTPM_PID_FILE" "$SWTPM_SOCKET"
-fi
-
 exit $EXIT_CODE
