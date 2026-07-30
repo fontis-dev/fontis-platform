@@ -13,25 +13,36 @@ mount -t devtmpfs devtmpfs /dev
 udevadm trigger --action=add
 udevadm settle --timeout=30
 
-# TPM PCR extend for measured boot
+# TPM PCR extend for measured boot: measure kernel cmdline and root hash
 if [ -c /dev/tpm0 ]; then
-    tpm2_pcrextend 10:sha256=0000000000000000000000000000000000000000000000000000000000000000
+    CMDLINE_HASH=$(cat /proc/cmdline | sha256sum | cut -d' ' -f1)
+    tpm2_pcrextend 10:sha256="$CMDLINE_HASH"
+    if [ -f /etc/roothash.pem ]; then
+        ROOTHASH=$(sha256sum /etc/roothash.pem | cut -d' ' -f1)
+        tpm2_pcrextend 10:sha256="$ROOTHASH"
+    fi
 fi
 
 # Unlock root partition (LUKS with TPM sealing)
-if [ -b /dev/sda2 ]; then
-    tpm2_unseal -c 0x81000000 -p 0 > /tmp/luks-key 2>/dev/null || true
-    if [ -s /tmp/luks-key ]; then
-        cryptsetup luksOpen --key-file=/tmp/luks-key /dev/sda2 cryptroot
-        rm -f /tmp/luks-key
+CRYPTROOT_DEV="/dev/disk/by-partlabel/cryptroot"
+VERITY_DEV="/dev/disk/by-partlabel/verity"
+LUKS_KEY_FILE=""
+
+if [ -b "$CRYPTROOT_DEV" ]; then
+    LUKS_KEY_FILE=$(mktemp -t luks-key.XXXXXXXX) || exit 1
+    trap 'rm -f "$LUKS_KEY_FILE"' EXIT
+    tpm2_unseal -c 0x81000000 -p 0 > "$LUKS_KEY_FILE" 2>/dev/null || true
+    if [ -s "$LUKS_KEY_FILE" ]; then
+        cryptsetup luksOpen --key-file="$LUKS_KEY_FILE" "$CRYPTROOT_DEV" cryptroot
     else
-        cryptsetup luksOpen /dev/sda2 cryptroot
+        echo "WARNING: TPM unseal failed; falling back to recovery passphrase"
+        cryptsetup luksOpen "$CRYPTROOT_DEV" cryptroot
     fi
 fi
 
 # Open dm-verity device on top of unlocked root
-if [ -b /dev/mapper/cryptroot ] && [ -b /dev/sda3 ]; then
-    veritysetup open /dev/mapper/cryptroot verity-root /dev/sda3 /etc/roothash.pem
+if [ -b /dev/mapper/cryptroot ] && [ -b "$VERITY_DEV" ]; then
+    veritysetup open --root-hash-file=/etc/roothash.pem /dev/mapper/cryptroot verity-root "$VERITY_DEV"
 fi
 
 # Mount verified root filesystem

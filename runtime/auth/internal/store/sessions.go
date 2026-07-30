@@ -143,5 +143,3 @@ func scanSession(row scanner) (*Session, error) {
 		CreatedAt:        ct,
 	}, nil
 }
-
-

@@ -61,8 +61,8 @@ func (s *Store) Migrate(ctx context.Context) error {
 }
 
 var (
-	sessionTTL        = 15 * time.Minute
-	refreshTTL        = 7 * 24 * time.Hour
+	sessionTTL = 15 * time.Minute
+	refreshTTL = 7 * 24 * time.Hour
 )
 
 const (
@@ -140,8 +140,6 @@ func verifyPassword(password, encoded string) (bool, error) {
 	}
 	return true, nil
 }
-
-
 
 func newUUID() (string, error) {
 	b, err := generateRandomBytes(16)

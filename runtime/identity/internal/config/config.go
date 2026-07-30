@@ -6,8 +6,8 @@ import (
 )
 
 type Config struct {
-	SocketPath string
-	DBPath     string
+	SocketPath  string
+	DBPath      string
 	TLSCertPath string
 	TLSKeyPath  string
 	TLSCAPath   string

@@ -130,11 +130,11 @@ func (s *Store) ListAPITokens(ctx context.Context, profileID string) ([]*pb.ApiT
 		}
 
 		t := &pb.ApiToken{
-			Id:         id,
-			ProfileId:  pid,
-			Name:       name,
-			TokenHash:  "",
-			CreatedAt:  timestamppb.New(ct),
+			Id:        id,
+			ProfileId: pid,
+			Name:      name,
+			TokenHash: "",
+			CreatedAt: timestamppb.New(ct),
 		}
 
 		if expiresAtStr != nil {
@@ -152,5 +152,3 @@ func (s *Store) ListAPITokens(ctx context.Context, profileID string) ([]*pb.ApiT
 	}
 	return tokens, nil
 }
-
-
