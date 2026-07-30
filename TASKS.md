@@ -66,6 +66,11 @@
 - [x] Create docs/ARCHITECTURE.md.
 - [x] Create docs/STANDARDS.md.
 - [x] Create CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md.
+- [x] Create `.github/PULL_REQUEST_TEMPLATE.md` with mandatory checklists.
+- [x] Create reusable skills in `.agents/skills/` (go-service, rust-hal, protobuf-contracts, pr-readiness, ai-project-manager).
+- [x] Create execution policy rules (`.opencode/rules.jsonc`).
+- [x] Add CodeRabbit pre-commit review gate to AGENTS.md.
+- [x] Add RTK installation and usage guidance to AGENTS.md.
 
 ## Next phase: Identity and Auth
 
