@@ -17,7 +17,7 @@ IMAGE_FILE="${IMAGE_FILE:-$BUILD_DIR/fontis-dev.wic}"
 KERNEL="${KERNEL:-}"
 INITRAMFS="${INITRAMFS:-}"
 SECURE_BOOT="${SECURE_BOOT:-false}"
-SECURE_BOOT_KEYS="${SECURE_BOOT_KEYS:-$PROJECT_DIR/core/boot/secure-boot/keys}"
+SECURE_BOOT_KEYS="${SECURE_BOOT_KEYS:-$HOME/.cache/fontis/secure-boot-keys}"
 
 SWTPM_SOCKET="${SWTPM_SOCKET:-/tmp/fontis-swtpm.sock}"
 SWTPM_STATE="${SWTPM_STATE:-/tmp/fontis-swtpm}"
@@ -211,12 +211,13 @@ if [ "$USE_TPM" = true ]; then
 
         echo "swtpm started (socket: $SWTPM_SOCKET, pid: $(cat "$SWTPM_PID_FILE"))"
 
-        # Ensure swtpm is cleaned up on exit (normal or abnormal)
+        # Ensure swtpm and OVMF vars are cleaned up on exit
         cleanup_swtpm() {
             if [ -f "$SWTPM_PID_FILE" ]; then
                 kill "$(cat "$SWTPM_PID_FILE")" 2>/dev/null || true
                 rm -f "$SWTPM_PID_FILE" "$SWTPM_SOCKET"
             fi
+            rm -f "$TEMP_VARS"
         }
         trap cleanup_swtpm EXIT
 

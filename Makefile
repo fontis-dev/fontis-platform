@@ -3,7 +3,7 @@ RUST_VERSION ?= 1.80
 HAL_MANIFEST := core/hal/Cargo.toml
 
 .PHONY: all build build-runtime build-hal build-image fmt lint typecheck
-.PHONY: test-unit test-integration test-hal security-scan clean qemu protoc-gen
+.PHONY: test-unit test-integration test-hal security-scan clean qemu qemu-direct qemu-secureboot protoc-gen
 
 all: build
 
@@ -11,11 +11,10 @@ build: build-runtime build-hal
 
 BUILD_DIR ?= build
 
+# TODO: not yet implemented — placeholder until debian/fontis-image-builder.sh is created
 build-image:
 	@echo "[build-image] Building Fontis Debian-based image..."
-	@echo "  See debian/fontis-image-builder.sh for the image build process."
-	@echo "  This target is not yet implemented."
-	@echo "  Prerequisites: debootstrap, debian-archive-keyring, dpkg-dev"
+	@echo "  Target not yet implemented."
 	@exit 1
 
 build-runtime: protoc-gen
@@ -174,8 +173,8 @@ qemu-direct:
 	scripts/qemu-setup.sh && scripts/qemu-boot.sh --kernel "$(KERNEL)" --initramfs "$(INITRAMFS)" $(QEMU_ARGS)
 
 qemu-secureboot:
-	@echo "[qemu] Booting Fontis with UEFI Secure Boot..."
-	scripts/qemu-setup.sh && scripts/qemu-boot.sh --secure-boot $(QEMU_ARGS)
+	@echo "[qemu] Booting Fontis with Secure Boot QEMU configuration (not enforced — enrollment not yet implemented)"
+	SECURE_BOOT=true scripts/qemu-setup.sh && scripts/qemu-boot.sh --secure-boot $(QEMU_ARGS)
 
 clean:
 	@echo "[clean] Cleaning Go build artifacts..."

@@ -15,7 +15,7 @@
 ### Core OS boot chain
 
 - [x] Implement UEFI Secure Boot infrastructure (key generation scripts, key enrollment docs). (Secure Boot enrollment validation requires Linux environment.)
-- [x] Create QEMU boot scripts (dependency setup, UEFI+TPM launch, direct kernel boot, Secure Boot mode, Makefile targets). (Requires Linux with QEMU, OVMF, swtpm for execution.)
+- [x] Create QEMU boot scripts (dependency setup, UEFI+TPM launch, direct kernel boot, Secure Boot mode, Makefile targets). (Requires Linux with QEMU, OVMF, swtpm for execution. Secure Boot enrollment not yet enforced in QEMU.)
 
 ### Display and input stack
 
