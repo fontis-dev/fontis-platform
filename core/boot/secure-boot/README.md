@@ -38,9 +38,9 @@ Copy the `*.auth` files to the device's EFI system partition and enroll from the
 sbkeysync --pk=PK.auth --kek=KEK.auth --db=db.auth
 ```
 
-## Yocto integration
+## Integration
 
-The build system (meta-fontis layer) automatically signs the bootloader and kernel during `make build-core`. Key location is configurable via `SECURE_BOOT_KEY_DIR` in the machine config.
+On Debian-based Fontis builds, bootloader and kernel signing is performed by the image build script (`debian/fontis-image-builder.sh`). The signing key directory is configured via the `FONTIS_SIGNING_KEY_DIR` environment variable.
 
 ## Production vs development
 

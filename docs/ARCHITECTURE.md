@@ -2,9 +2,9 @@
 
 ## Overview
 
-fontis-platform is a purpose-built Linux-based operating system and runtime environment for the Fontis household device. It consists of two layers:
+fontis-platform is a Linux-based appliance operating system for the Fontis household device. It is built on Debian Stable with custom Fontis platform services. It consists of two layers:
 
-- **Core OS** (`core/`) — the kernel, boot chain, base system packages, and hardware abstraction. This layer is minimal and stable. It is updated infrequently and changes are high-risk.
+- **Core OS** — Debian Stable base (minimal install, hardened kernel, boot chain, initramfs) plus the Rust Hardware Abstraction Layer (`core/hal/`). The base OS is updated via atomic A/B image updates; the HAL is specific to Fontis hardware.
 - **Platform Runtime** (`runtime/`) — a set of independent Go services that provide the household-facing functionality. Each service is an isolated process communicating via gRPC.
 
 ---
@@ -75,22 +75,17 @@ fontis-platform is a purpose-built Linux-based operating system and runtime envi
 
 ---
 
-## Core OS Layer (`core/`)
+## Core OS Layer
 
-### Kernel (`core/kernel/`)
+The Core OS is Debian Stable with a minimal, hardened package selection. The kernel is the Debian Stable kernel with required hardware drivers (storage, networking, TPM, UEFI, GPU, input, audio). Custom kernel config fragments from the Yocto layer informed the Debian kernel module selection.
 
-- Linux kernel configured for the target architecture (x86-64, ARM64 future).
-- Minimal configuration: only required drivers and subsystems.
-- Security features enabled: SELinux, integrity subsystem (IMA/EVM), dm-crypt, dm-verity, TPM, audit.
-- Kernel image is signed and verified during boot.
+### Boot Chain
 
-### Boot (`core/boot/`)
-
-- **Bootloader:** systemd-boot (simple, supports UEFI Secure Boot, signed binaries).
-- **Secure Boot:** UEFI Secure Boot with custom Platform Key (PK) and Key Exchange Key (KEK).
-- **Measured Boot:** TPM PCRs record every stage of the boot chain.
-- **Initramfs:** Minimal initramfs with cryptsetup, LVM (if applicable), and a recovery shell. The initramfs is signed and verified.
-- **Root filesystem:** dm-verity protected. Read-only root with overlay for writable state.
+- **Bootloader:** systemd-boot (UEFI) — included with Debian, configured for Fontis.
+- **Secure Boot:** UEFI Secure Boot with custom Platform Key (PK), Key Exchange Key (KEK), and Signature Database (db). Keys are generated with `core/boot/secure-boot/gen-keys.sh`. EFI binaries (bootloader, kernel) are signed with the db key.
+- **Measured Boot:** TPM 2.0 measures each boot stage. The initramfs (Debian initramfs-tools with Fontis hooks) records an event log and extends PCRs for kernel, cmdline, root hash, and boot state.
+- **Root filesystem:** dm-verity protected (via Debian's veritysetup). Read-only root with encrypted overlay for writable state.
+- **Initramfs:** Built with Debian's initramfs-tools, customized with Fontis hooks for TPM event logging, LUKS unlock (TPM-sealed key with passphrase fallback), and dm-verity verification.
 
 ### Hardware Abstraction (`core/hal/`)
 
@@ -265,10 +260,10 @@ Multi-monitor support is deferred to a future version.
 
 ### Building
 ```bash
-make build                    # Build all targets
-make build-core               # Build core OS image
+make build                    # Build runtime services and HAL
 make build-runtime            # Build runtime Go services
 make build-hal                # Build Rust HAL crate
+make build-image              # Build Debian-based core OS image
 ```
 
 ### Running in Emulation

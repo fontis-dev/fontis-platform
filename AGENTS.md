@@ -10,10 +10,8 @@ For org-wide AI rules, read AI_CONSTITUTION.md from fontis-foundation. For engin
 
 ```
 ├── core/                       Core OS layer
-│   ├── kernel/                 Linux kernel configuration
-│   ├── boot/                   Bootloader, initramfs, secure boot
-│   ├── packages/               Base system packages and image
-│   └── hal/                    Hardware abstraction layer (Rust)
+│   ├── boot/                   Secure boot and key management
+│   ├── hal/                    Hardware abstraction layer (Rust)
 ├── runtime/                    Platform Runtime services (Go)
 │   ├── identity/               User identity, profiles, households
 │   ├── auth/                   Authentication and authorization
@@ -54,7 +52,7 @@ For org-wide AI rules, read AI_CONSTITUTION.md from fontis-foundation. For engin
 7. **Commit** — one focused commit per item. No drive-by changes.
 8. **Open PR** — fill in `.github/PULL_REQUEST_TEMPLATE.md` completely. CodeRabbit auto-reviews the PR (unlimited Pro+ on public repos). Fix its findings with follow-up commits.
 9. **Independent human review** — not self-review. Resolve all threads.
-10. **Manual testing** — on real target if HAL changes, screenshots if UI changes. QEMU or real-target validation required for boot, image, and security changes (kernel, initramfs, bootloader/TPM, WIC layout, SELinux integration).
+10. **Manual testing** — on real target if HAL changes, screenshots if UI changes. QEMU or real-target validation required for boot and security changes (kernel, initramfs, bootloader/TPM, SELinux integration).
 11. **Merge** — only when CI, CodeRabbit, independent review, security scans, and manual tests are clean.
 
 ## Command execution
@@ -67,7 +65,10 @@ For org-wide AI rules, read AI_CONSTITUTION.md from fontis-foundation. For engin
 ## Build system
 
 ```bash
-make build          # Build all targets
+make build          # Build runtime services and HAL
+make build-runtime  # Build all runtime Go services
+make build-hal      # Build Rust HAL crate
+make build-image    # Build Debian-based core OS image
 make fmt            # Format all code
 make lint           # Lint all code
 make typecheck      # Type-check (Go, Rust)
@@ -89,7 +90,7 @@ make clean          # Clean build artifacts
 ## Validation
 
 - Run the full local gate before committing: `git diff --check && make fmt && make lint && make typecheck && make build && make test-unit && make test-integration && make security-scan`
-- Run `scripts/validate.sh` after changing project configuration, build scripts, or CI.
+- Run `make build-image` after changing image configuration or base OS packages.
 - For HAL changes affecting real hardware, manual testing on target is required.
 
 ## Pull requests
