@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 
 	pb "github.com/fontis-dev/fontis-platform/runtime/identity/proto"
 	"google.golang.org/grpc/codes"
@@ -94,6 +95,9 @@ func (s *Server) CreateProfile(ctx context.Context, req *pb.CreateProfileRequest
 
 	p, err := s.store.CreateProfile(ctx, req.HouseholdId, req.DisplayName, role)
 	if err != nil {
+		if strings.Contains(err.Error(), "FOREIGN KEY constraint failed") {
+			return nil, status.Errorf(codes.NotFound, "household %s not found", req.HouseholdId)
+		}
 		return nil, status.Errorf(codes.Internal, "create profile: %v", err)
 	}
 
