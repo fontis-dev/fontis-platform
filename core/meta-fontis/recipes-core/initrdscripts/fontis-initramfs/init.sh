@@ -13,14 +13,13 @@ mount -t devtmpfs devtmpfs /dev
 udevadm trigger --action=add
 udevadm settle --timeout=30
 
-# TPM PCR extend for measured boot: measure kernel cmdline and root hash
+# Extract dm-verity root hash from kernel cmdline (set by dm-verity-image.bbclass)
+ROOTHASH=$(sed -n 's/.*roothash=\([^ ]*\).*/\1/p' /proc/cmdline)
+
+# TPM PCR extend for measured boot: measure kernel cmdline (includes roothash)
 if [ -c /dev/tpm0 ]; then
     CMDLINE_HASH=$(cat /proc/cmdline | sha256sum | cut -d' ' -f1)
     tpm2_pcrextend 10:sha256="$CMDLINE_HASH"
-    if [ -f /etc/roothash.pem ]; then
-        ROOTHASH=$(sha256sum /etc/roothash.pem | cut -d' ' -f1)
-        tpm2_pcrextend 10:sha256="$ROOTHASH"
-    fi
 fi
 
 # Unlock root partition (LUKS with TPM sealing)
@@ -41,8 +40,8 @@ if [ -b "$CRYPTROOT_DEV" ]; then
 fi
 
 # Open dm-verity device on top of unlocked root
-if [ -b /dev/mapper/cryptroot ] && [ -b "$VERITY_DEV" ]; then
-    veritysetup open --root-hash-file=/etc/roothash.pem /dev/mapper/cryptroot verity-root "$VERITY_DEV"
+if [ -b /dev/mapper/cryptroot ] && [ -b "$VERITY_DEV" ] && [ -n "$ROOTHASH" ]; then
+    veritysetup open /dev/mapper/cryptroot verity-root "$VERITY_DEV" "$ROOTHASH"
 fi
 
 # Mount verified root filesystem
