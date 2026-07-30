@@ -180,7 +180,7 @@ protoc-gen:
 			protoc --go_out="$$output_dir" --go_opt=module=github.com/fontis-dev/fontis-platform/runtime/$$service \
 				--go-grpc_out="$$output_dir" --go-grpc_opt=module=github.com/fontis-dev/fontis-platform/runtime/$$service \
 				-I contracts/protobuf \
-				"$$proto_dir"/*.proto; \
+				"$$proto_dir"/*.proto || exit 1; \
 		fi; \
 	done
 	@echo "[protoc-gen] Done"
