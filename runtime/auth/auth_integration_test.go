@@ -207,6 +207,31 @@ func TestAuthIntegration_AuthenticateInvalidPassword(t *testing.T) {
 	}
 }
 
+func TestAuthIntegration_AuthenticateInternalError(t *testing.T) {
+	client, st, cleanup := newAuthTestServer(t)
+	defer cleanup()
+
+	if err := st.SetPassword(rpcCtx(t), "profile-1", "password"); err != nil {
+		t.Fatalf("SetPassword: %v", err)
+	}
+
+	st.Close()
+
+	_, err := client.Authenticate(rpcCtx(t), &pb.AuthenticateRequest{
+		ProfileId: "profile-1",
+		Password:  "password",
+	})
+	if err == nil {
+		t.Fatal("expected error for closed store")
+	}
+	if status.Code(err) != codes.Internal {
+		t.Errorf("got code %v, want %v", status.Code(err), codes.Internal)
+	}
+	if status.Convert(err).Message() != "internal error" {
+		t.Errorf("got message %q, want %q", status.Convert(err).Message(), "internal error")
+	}
+}
+
 func TestAuthIntegration_APITokenLifecycle(t *testing.T) {
 	client, _, cleanup := newAuthTestServer(t)
 	defer cleanup()

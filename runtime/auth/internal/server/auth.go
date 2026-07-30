@@ -26,6 +26,9 @@ func (s *Server) Authenticate(ctx context.Context, req *pb.AuthenticateRequest) 
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, status.Error(codes.PermissionDenied, "invalid credentials")
 		}
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			return nil, status.FromContextError(err).Err()
+		}
 		log.Printf("verify password error: %v", err)
 		return nil, status.Error(codes.Internal, "internal error")
 	}
