@@ -289,8 +289,8 @@ func TestIdentityIntegration_Errors(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for nonexistent household")
 	}
-	if status.Code(err) != codes.Internal {
-		t.Errorf("got code %v, want %v", status.Code(err), codes.Internal)
+	if status.Code(err) != codes.NotFound {
+		t.Errorf("got code %v, want %v", status.Code(err), codes.NotFound)
 	}
 }
 
