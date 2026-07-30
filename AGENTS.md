@@ -54,7 +54,7 @@ For org-wide AI rules, read AI_CONSTITUTION.md from fontis-foundation. For engin
 7. **Commit** — one focused commit per item. No drive-by changes.
 8. **Open PR** — fill in `.github/PULL_REQUEST_TEMPLATE.md` completely. CodeRabbit auto-reviews the PR (unlimited Pro+ on public repos). Fix its findings with follow-up commits.
 9. **Independent human review** — not self-review. Resolve all threads.
-10. **Manual testing** — on real target if HAL changes, screenshots if UI changes.
+10. **Manual testing** — on real target if HAL changes, screenshots if UI changes. QEMU or real-target validation required for boot, image, and security changes (kernel, initramfs, bootloader/TPM, WIC layout, SELinux integration).
 11. **Merge** — only when CI, CodeRabbit, independent review, security scans, and manual tests are clean.
 
 ## Command execution

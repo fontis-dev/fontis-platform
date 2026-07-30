@@ -14,7 +14,6 @@ RDEPENDS:packagegroup-fontis-base = "\
     ca-certificates \
     cryptsetup \
     dbus \
-    dm-verity \
     e2fsprogs \
     glibc \
     kmod \

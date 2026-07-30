@@ -108,5 +108,3 @@ func LoadTLSConfig(cfg *config.Config) (*tls.Config, error) {
 	}
 	return tlsCfg, nil
 }
-
-

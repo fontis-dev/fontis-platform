@@ -1,7 +1,7 @@
-LINUX_VERSION = "6.6.y"
+LINUX_VERSION = "6.6.62"
 LINUX_VERSION_EXTENSION = "-fontis"
 
-SRCREV = "${AUTOREV}"
+SRCREV = "v6.6.62"
 
 SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch=linux-${LINUX_VERSION};protocol=https"
 
