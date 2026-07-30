@@ -69,7 +69,7 @@
 - [x] Create `.github/PULL_REQUEST_TEMPLATE.md` with mandatory checklists.
 - [x] Create reusable skills in `.agents/skills/` (go-service, rust-hal, protobuf-contracts, pr-readiness, ai-project-manager).
 - [x] Create execution policy rules (`.opencode/rules.jsonc`).
-- [x] Add CodeRabbit pre-commit review gate to AGENTS.md.
+- [x] Add CodeRabbit local and PR-based review workflow to AGENTS.md.
 - [x] Add RTK installation and usage guidance to AGENTS.md.
 
 ## Next phase: Identity and Auth
