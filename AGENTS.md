@@ -43,6 +43,20 @@ For org-wide AI rules, read AI_CONSTITUTION.md from fontis-foundation. For engin
 - Keep communication direct and concise. Skip flattery, filler, ceremonial openings, and emoji.
 - Read the ENGINEERING_PRINCIPLES.md precedence: Security > Correctness > Maintainability > Simplicity > Reliability > Performance > Developer Productivity > Feature Velocity.
 
+## Workflow (follow in order)
+
+1. **Inspect** — branch, worktree, validation state, TASKS.md status.
+2. **Plan** — map the change to a SPEC.md requirement, break into reviewable items, update TASKS.md.
+3. **Implement one phase** — smallest reviewable increment. Touch only what the task requires.
+4. **Run focused checks** — `go vet ./...` and `go build ./...` and `go test -count=1 ./...` on affected packages.
+5. **Run the full local gate** — `git diff --check && make fmt && make lint && make typecheck && make build && make test-unit && make test-integration && make security-scan`. Fix any failures.
+6. **Update TASKS.md** — only after the gate passes.
+7. **Commit** — one focused commit per item. No drive-by changes.
+8. **Open PR** — fill in `.github/PULL_REQUEST_TEMPLATE.md` completely. CodeRabbit auto-reviews the PR (unlimited Pro+ on public repos). Fix its findings with follow-up commits.
+9. **Independent human review** — not self-review. Resolve all threads.
+10. **Manual testing** — on real target if HAL changes, screenshots if UI changes.
+11. **Merge** — only when CI, CodeRabbit, independent review, security scans, and manual tests are clean.
+
 ## Command execution
 
 - Prefer running code, tests, linters, and type checks over guessing.
@@ -81,11 +95,7 @@ make clean          # Clean build artifacts
 ## Pull requests
 
 - Use `.github/PULL_REQUEST_TEMPLATE.md` for every PR. Fill in all sections.
-- Before opening a PR, run the CodeRabbit local review as a pre-commit gate:
-  ```bash
-  coderabbit review --agent --uncommitted --include-untracked
-  ```
-  Fix all actionable findings. Document any intentionally skipped items with a reason.
+- CodeRabbit is installed on this repo and auto-reviews every PR (unlimited Pro+ on public repos). Fix all actionable findings; document intentionally skipped items with a reason.
 - After opening a PR, require CI validation, security checks, CodeRabbit review, and at least one independent human review on the latest commit before merging.
 - Every review thread must be resolved or have a documented response.
 - Record manual testing evidence in the PR body. For HAL changes, test on real target hardware. For UI changes, include screenshots.

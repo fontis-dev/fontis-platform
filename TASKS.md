@@ -5,7 +5,8 @@
 ### Build system and toolchain
 
 - [x] Create Makefile with targets: build, fmt, lint, typecheck, test-unit, test-integration, security-scan, clean.
-- [ ] Set up Yocto layer structure for core OS image.
+- [x] Set up Yocto layer structure for core OS image.
+  - Structure created; full build validation requires a Yocto build environment (see `make build-core`).
 - [ ] Configure Linux kernel with required drivers (storage, networking, TPM, UEFI) and security features (SELinux/AppArmor, integrity subsystem, dm-crypt, dm-verity).
 - [ ] Add GPU drivers to kernel config (i915, amdgpu, dummy) for DRM/KMS support.
 - [ ] Add evdev and ALSA drivers to kernel config for input and audio.

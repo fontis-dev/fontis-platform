@@ -9,8 +9,28 @@ all: build
 
 build: build-core build-runtime build-hal
 
+BUILD_DIR ?= build
+POKY_DIR ?= poky
+
 build-core:
-	@echo "[build-core] Not yet implemented -- requires Yocto setup, kernel config, boot chain"
+	@echo "[build-core] Building core OS image (Yocto)..."
+	@if command -v bitbake >/dev/null 2>&1 || [ -f "$(POKY_DIR)/oe-init-build-env" ]; then \
+		echo "  Yocto environment detected, starting build..."; \
+		. "$(POKY_DIR)/oe-init-build-env" $(BUILD_DIR) && \
+		bitbake-layers add-layer $(CURDIR)/core/meta-fontis && \
+		bitbake-layers add-layer $(CURDIR)/../meta-openembedded/meta-oe && \
+		bitbake fontis-full-image; \
+	else \
+		echo "  Yocto build environment not found."; \
+		echo "  1. Clone poky: git clone --depth=1 -b scarthgap https://git.yoctoproject.org/poky"; \
+		echo "  2. Clone meta-openembedded: git clone --depth=1 -b scarthgap https://git.openembedded.org/meta-openembedded"; \
+		echo "  3. Set POKY_DIR or run from a sourced Yocto environment"; \
+		echo "  Layer: $(CURDIR)/core/meta-fontis/"; \
+		echo "  Layer dependency: meta-openembedded/meta-oe (required)"; \
+		echo "  Machine: fontis-dev"; \
+		echo "  Image targets: fontis-base-image, fontis-full-image"; \
+		exit 1; \
+	fi
 
 build-runtime:
 	@echo "[build-runtime] Building Go runtime services..."
@@ -137,7 +157,7 @@ security-scan:
 	fi
 	@echo "[security-scan] Done"
 
-protoc-gen:
+protoc-gen: | build-runtime
 	@echo "[protoc-gen] Regenerating Protobuf Go code..."
 	@for proto_dir in contracts/protobuf/*/v1; do \
 		if [ -d "$$proto_dir" ]; then \

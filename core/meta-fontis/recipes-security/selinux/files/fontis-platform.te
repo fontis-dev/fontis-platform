@@ -1,0 +1,25 @@
+# Fontis platform SELinux policy
+# Each runtime service runs as an isolated domain
+# This is a skeleton policy that will be expanded during implementation
+
+policy_module(fontis_platform, 1.0.0)
+
+# Identity service domain
+type identity_service_t;
+domain_type(identity_service_t)
+
+# Auth service domain
+type auth_service_t;
+domain_type(auth_service_t)
+
+# Storage service domain
+type storage_service_t;
+domain_type(storage_service_t)
+
+# Networking service domain
+type networking_service_t;
+domain_type(networking_service_t)
+
+# Socket directories for inter-service communication
+type fontis_socket_t;
+files_type(fontis_socket_t)
