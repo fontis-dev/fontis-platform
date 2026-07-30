@@ -10,7 +10,7 @@ S = "${WORKDIR}"
 inherit core-image
 
 # Minimal base packages for initramfs environment
-IMAGE_INSTALL = "busybox tpm2-tools cryptsetup dm-verity"
+IMAGE_INSTALL = "busybox tpm2-tools cryptsetup dm-verity kmod"
 
 # Generate cpio archive for initramfs
 IMAGE_FSTYPES = "cpio.gz"

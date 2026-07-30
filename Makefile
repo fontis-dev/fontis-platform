@@ -186,7 +186,23 @@ protoc-gen:
 	@echo "[protoc-gen] Done"
 
 qemu:
-	@echo "[qemu] Not yet implemented -- requires bootable core OS image"
+	@echo "[qemu] Booting Fontis platform in QEMU..."
+	@scripts/qemu-setup.sh && scripts/qemu-boot.sh $(QEMU_ARGS)
+
+qemu-direct:
+	@echo "[qemu] Booting Fontis with direct kernel/initramfs..."
+	@echo "  Usage: make qemu-direct KERNEL=/path/to/bzImage INITRAMFS=/path/to/initrd.img"
+	@echo ""
+	@if [ -z "$(KERNEL)" ] || [ -z "$(INITRAMFS)" ]; then \
+		echo "Error: KERNEL and INITRAMFS required."; \
+		echo "  make qemu-direct KERNEL=build/tmp/deploy/images/fontis-dev/bzImage INITRAMFS=build/tmp/deploy/images/fontis-dev/initrd.img"; \
+		exit 1; \
+	fi
+	scripts/qemu-setup.sh && scripts/qemu-boot.sh --kernel "$(KERNEL)" --initramfs "$(INITRAMFS)" $(QEMU_ARGS)
+
+qemu-secureboot:
+	@echo "[qemu] Booting Fontis with UEFI Secure Boot..."
+	scripts/qemu-setup.sh && scripts/qemu-boot.sh --secure-boot $(QEMU_ARGS)
 
 clean:
 	@echo "[clean] Cleaning Go build artifacts..."

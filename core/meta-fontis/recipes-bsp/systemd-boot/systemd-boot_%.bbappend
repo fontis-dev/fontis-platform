@@ -1,6 +1,9 @@
 # Fontis systemd-boot configuration
 # - Custom timeout
 # - Default entry to Fontis platform
+# - Signed EFI binary for UEFI Secure Boot
+
+inherit sign-images
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
@@ -15,6 +18,14 @@ do_install:append() {
     # Deploy to EFI provider path for image inclusion
     install -d ${D}${EFI_PREFIX}/loader/entries
     install -m 644 ${WORKDIR}/fontis-boot.conf ${D}${EFI_PREFIX}/loader/entries/fontis.conf
+}
+
+# Sign the bootloader binary after installation
+do_deploy:append() {
+    bootloader="${DEPLOYDIR}/${BOOTLOADER_EFI_BINARY}"
+    if [ -f "$bootloader" ]; then
+        sign_efi "$bootloader"
+    fi
 }
 
 FILES:${PN} += "/loader/entries/fontis.conf ${EFI_PREFIX}/loader/entries/fontis.conf"
