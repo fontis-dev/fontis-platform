@@ -12,6 +12,7 @@ build: build-core build-runtime build-hal
 BUILD_DIR ?= build
 POKY_DIR ?= poky
 META_OE_DIR ?= $(CURDIR)/meta-openembedded/meta-oe
+META_SECURITY_DIR ?= $(CURDIR)/meta-security
 
 build-core:
 	@echo "[build-core] Building core OS image (Yocto)..."
@@ -20,20 +21,24 @@ build-core:
 		. "$(POKY_DIR)/oe-init-build-env" $(BUILD_DIR) && \
 		bitbake-layers add-layer $(CURDIR)/core/meta-fontis && \
 		bitbake-layers add-layer $(META_OE_DIR) && \
+		bitbake-layers add-layer $(META_SECURITY_DIR)/meta-tpm && \
 		MACHINE=fontis-dev bitbake fontis-full-image; \
-	elif command -v bitbake >/dev/null 2>&1; then \
+	elif command -v bitbake >/dev/null 2>&1 && [ -f "$(BUILD_DIR)/conf/local.conf" ]; then \
 		echo "  Yocto environment already sourced, using existing bitbake..."; \
 		bitbake-layers add-layer $(CURDIR)/core/meta-fontis && \
 		bitbake-layers add-layer $(META_OE_DIR) && \
+		bitbake-layers add-layer $(META_SECURITY_DIR)/meta-tpm && \
 		MACHINE=fontis-dev bitbake fontis-full-image; \
 	else \
 		echo "  Yocto build environment not found."; \
 		echo "  1. Clone poky: git clone --depth=1 -b scarthgap https://git.yoctoproject.org/poky"; \
 		echo "  2. Clone meta-openembedded: git clone --depth=1 -b scarthgap https://git.openembedded.org/meta-openembedded"; \
 		echo "     (set META_OE_DIR if not at ./meta-openembedded/meta-oe)"; \
-		echo "  3. Set POKY_DIR or run from a sourced Yocto environment"; \
+		echo "  3. Clone meta-security: git clone --depth=1 -b scarthgap https://git.yoctoproject.org/meta-security"; \
+		echo "     (set META_SECURITY_DIR if not at ./meta-security)"; \
+		echo "  4. Set POKY_DIR or run from a sourced Yocto environment"; \
 		echo "  Layer: $(CURDIR)/core/meta-fontis/"; \
-		echo "  Layer dependency: meta-security (meta-tpm) for TPM2/checksec"; \
+		echo "  Layer dependencies: meta-openembedded/meta-oe, meta-security/meta-tpm"; \
 		echo "  Machine: fontis-dev"; \
 		echo "  Image targets: fontis-base-image, fontis-full-image"; \
 		exit 1; \
