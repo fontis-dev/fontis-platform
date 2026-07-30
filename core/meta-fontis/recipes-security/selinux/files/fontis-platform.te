@@ -6,16 +6,16 @@
 module fontis_platform 1.0.0;
 
 # Identity service domain
-type identity_service_t;
+type identity_service_t, domain;
 
 # Auth service domain
-type auth_service_t;
+type auth_service_t, domain;
 
 # Storage service domain
-type storage_service_t;
+type storage_service_t, domain;
 
 # Networking service domain
-type networking_service_t;
+type networking_service_t, domain;
 
 # Socket directories for inter-service communication
-type fontis_socket_t;
+type fontis_socket_t, file_type;

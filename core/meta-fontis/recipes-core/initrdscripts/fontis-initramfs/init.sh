@@ -52,10 +52,14 @@ fi
 if [ -b /dev/mapper/verity-root ]; then
     mount -o ro /dev/mapper/verity-root /root || {
         echo "ERROR: failed to mount verity-root"
+        rm -f "$LUKS_KEY_FILE"
+        trap - EXIT
         exec /bin/sh
     }
 else
     echo "ERROR: verity-root device not available, dropping to recovery shell"
+    rm -f "$LUKS_KEY_FILE"
+    trap - EXIT
     exec /bin/sh
 fi
 
