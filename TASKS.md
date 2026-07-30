@@ -5,10 +5,7 @@
 ### Build system and toolchain
 
 - [x] Create Makefile with targets: build, fmt, lint, typecheck, test-unit, test-integration, security-scan, clean.
-- [x] Set up Yocto layer structure for core OS image (structure created, CodeRabbit-reviewed; full build validation requires a Linux Yocto build environment, see `make build-core`).
-- [x] Configure Linux kernel with required drivers (storage, networking, TPM, UEFI) and security features (SELinux/AppArmor, integrity subsystem, dm-crypt, dm-verity). (Config fragments complete; Yocto build validation requires Linux build environment, see `make build-core`.)
-- [x] Add GPU drivers to kernel config (i915, amdgpu, dummy) for DRM/KMS support. (Config fragments complete; Yocto build validation requires Linux build environment.)
-- [x] Add evdev and ALSA drivers to kernel config for input and audio. (Config fragments complete; Yocto build validation requires Linux build environment.)
+- [~] Set up Debian Stable base with custom image builder (supersedes Yocto layer; see `debian/` for image build scripts).
 - [x] Set up Rust toolchain and project structure for `core/hal/`.
 - [x] Set up Go toolchain and project structure for `runtime/` services.
 - [x] Create CI pipeline (`.github/workflows/ci.yml`) with build, lint, test jobs.
@@ -17,10 +14,7 @@
 
 ### Core OS boot chain
 
-- [x] Implement UEFI Secure Boot infrastructure (key generation scripts, sign-images bbclass, key enrollment docs). (Yocto build validation requires Linux environment.)
-- [x] Create signed bootloader configuration (systemd-boot EFI signed via sign-images class; boot config with secure boot flags enabled in machine conf). (Yocto build and Secure Boot enrollment validation requires Linux environment.)
-- [x] Create initramfs with minimal recovery shell (TPM event log, passphrase fallback for development, boot counter for A/B tracking, diagnostic recovery shell).
-- [x] Implement measured boot via TPM (event log, PCR extension for kernel version, cmdline, roothash, cryptroot UUID, verity status). (Yocto/TPM validation requires Linux build environment.)
+- [x] Implement UEFI Secure Boot infrastructure (key generation scripts, key enrollment docs). (Secure Boot enrollment validation requires Linux environment.)
 - [x] Create QEMU boot scripts (dependency setup, UEFI+TPM launch, direct kernel boot, Secure Boot mode, Makefile targets). (Requires Linux with QEMU, OVMF, swtpm for execution.)
 
 ### Display and input stack
@@ -71,6 +65,7 @@
 - [x] Create execution policy rules (`.opencode/rules.jsonc`).
 - [x] Add CodeRabbit local and PR-based review workflow to AGENTS.md.
 - [x] Add RTK installation and usage guidance to AGENTS.md.
+- [x] Rewrite docs for Yocto-to-Debian pivot (Makefile, SPEC, ROADMAP, TASKS, AGENTS, ARCHITECTURE, STANDARDS, secure-boot README).
 
 ## Next phase: Identity and Auth
 

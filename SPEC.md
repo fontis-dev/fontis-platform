@@ -51,7 +51,7 @@ See `docs/ARCHITECTURE.md` for the complete architecture.
 
 | Layer | Technology | Rationale |
 | --- | --- | --- |
-| OS substrate | Linux (Yocto-based) | Proven, secure, widely supported |
+| OS substrate | Linux (Debian Stable) | Proven stability, long-term security support, widely supported appliance OS |
 | Hardware abstraction | Rust | Memory safety, zero-cost abstractions, security-critical |
 | Runtime services | Go | Simple, explicit, excellent tooling, strong standard library |
 | Storage metadata | SQLite | Embedded, reliable, zero-administration |

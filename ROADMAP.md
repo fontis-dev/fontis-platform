@@ -10,10 +10,10 @@ Establish the build system, core OS image, and development toolchain. Produce a 
 
 ### Included work
 
-- Set up Yocto-based build system for the core OS image.
-- Configure Linux kernel with required drivers and security features including GPU (i915, amdgpu, dummy), DRM/KMS, evdev, ALSA.
+- Set up Debian Stable base with custom image builder (debootstrap + hardening + Fontis packages).
+- Select Linux kernel (Debian Stable kernel or backports) with required drivers (storage, networking, TPM, UEFI, GPU, input, audio).
 - Evaluate Wayland compositor options (wlroots-based, Weston) and select target.
-- Implement boot infrastructure: UEFI Secure Boot, signed bootloader, initramfs.
+- Implement boot chain hardening: UEFI Secure Boot key generation, initramfs TPM integration.
 - Set up the Rust HAL toolchain and project structure under `core/hal/` including GPU and audio HAL stubs.
 - Set up the Go runtime project structure with build tooling.
 - Create the `contracts/protobuf/` directory with initial identity and auth service schemas.
@@ -23,14 +23,13 @@ Establish the build system, core OS image, and development toolchain. Produce a 
 
 ### Risks
 
-- Yocto build time and complexity may slow initial iteration. Consider a simpler base image for early development.
-- GPT-4o may hallucinate kernel configuration options. Verify every kernel config against kernel.org documentation.
 - UEFI Secure Boot setup requires signing infrastructure and key management planning.
+- Debian package selection must be minimal; avoid unnecessary services and attack surface.
 
 ### Exit criteria
 
-- `make build` produces a bootable x86-64 UEFI image from a clean checkout.
-- The image boots on reference hardware (or QEMU) to a kernel panic with a visible initramfs shell.
+- `make build-image` produces a bootable x86-64 UEFI image from a clean checkout.
+- The image boots on reference hardware (or QEMU) to a working Debian base with Fontis runtime services.
 - The Rust HAL crate compiles with no warnings and includes GPU/audio stubs.
 - The Go runtime skeleton compiles with no errors.
 - Wayland compositor candidate is selected and evaluated on target hardware (renders a test surface through DRM/KMS).

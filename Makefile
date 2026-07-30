@@ -2,47 +2,21 @@ GO_VERSION ?= 1.25
 RUST_VERSION ?= 1.80
 HAL_MANIFEST := core/hal/Cargo.toml
 
-.PHONY: all build build-core build-runtime build-hal fmt lint typecheck
+.PHONY: all build build-runtime build-hal build-image fmt lint typecheck
 .PHONY: test-unit test-integration test-hal security-scan clean qemu protoc-gen
 
 all: build
 
-build: build-core build-runtime build-hal
+build: build-runtime build-hal
 
 BUILD_DIR ?= build
-POKY_DIR ?= poky
-META_OE_DIR ?= $(CURDIR)/meta-openembedded/meta-oe
-META_SECURITY_DIR ?= $(CURDIR)/meta-security
 
-build-core:
-	@echo "[build-core] Building core OS image (Yocto)..."
-	@if [ -f "$(POKY_DIR)/oe-init-build-env" ]; then \
-		echo "  Yocto environment detected, starting build..."; \
-		. "$(POKY_DIR)/oe-init-build-env" $(BUILD_DIR) && \
-		bitbake-layers add-layer $(CURDIR)/core/meta-fontis && \
-		bitbake-layers add-layer $(META_OE_DIR) && \
-		bitbake-layers add-layer $(META_SECURITY_DIR)/meta-tpm && \
-		MACHINE=fontis-dev bitbake fontis-full-image; \
-	elif command -v bitbake >/dev/null 2>&1 && [ -f "$(BUILD_DIR)/conf/local.conf" ]; then \
-		echo "  Yocto environment already sourced, using existing bitbake..."; \
-		bitbake-layers add-layer $(CURDIR)/core/meta-fontis && \
-		bitbake-layers add-layer $(META_OE_DIR) && \
-		bitbake-layers add-layer $(META_SECURITY_DIR)/meta-tpm && \
-		MACHINE=fontis-dev bitbake fontis-full-image; \
-	else \
-		echo "  Yocto build environment not found."; \
-		echo "  1. Clone poky: git clone --depth=1 -b scarthgap https://git.yoctoproject.org/poky"; \
-		echo "  2. Clone meta-openembedded: git clone --depth=1 -b scarthgap https://git.openembedded.org/meta-openembedded"; \
-		echo "     (set META_OE_DIR if not at ./meta-openembedded/meta-oe)"; \
-		echo "  3. Clone meta-security: git clone --depth=1 -b scarthgap https://git.yoctoproject.org/meta-security"; \
-		echo "     (set META_SECURITY_DIR if not at ./meta-security)"; \
-		echo "  4. Set POKY_DIR or run from a sourced Yocto environment"; \
-		echo "  Layer: $(CURDIR)/core/meta-fontis/"; \
-		echo "  Layer dependencies: meta-openembedded/meta-oe, meta-security/meta-tpm"; \
-		echo "  Machine: fontis-dev"; \
-		echo "  Image targets: fontis-base-image, fontis-full-image"; \
-		exit 1; \
-	fi
+build-image:
+	@echo "[build-image] Building Fontis Debian-based image..."
+	@echo "  See debian/fontis-image-builder.sh for the image build process."
+	@echo "  This target is not yet implemented."
+	@echo "  Prerequisites: debootstrap, debian-archive-keyring, dpkg-dev"
+	@exit 1
 
 build-runtime: protoc-gen
 	@echo "[build-runtime] Building Go runtime services..."
@@ -191,11 +165,10 @@ qemu:
 
 qemu-direct:
 	@echo "[qemu] Booting Fontis with direct kernel/initramfs..."
-	@echo "  Usage: make qemu-direct KERNEL=/path/to/bzImage INITRAMFS=/path/to/initrd.img"
+	@echo "  Usage: make qemu-direct KERNEL=/path/to/bzImage INITRAMFS=/path/to/initrd"
 	@echo ""
 	@if [ -z "$(KERNEL)" ] || [ -z "$(INITRAMFS)" ]; then \
 		echo "Error: KERNEL and INITRAMFS required."; \
-		echo "  make qemu-direct KERNEL=build/tmp/deploy/images/fontis-dev/bzImage INITRAMFS=build/tmp/deploy/images/fontis-dev/initrd.img"; \
 		exit 1; \
 	fi
 	scripts/qemu-setup.sh && scripts/qemu-boot.sh --kernel "$(KERNEL)" --initramfs "$(INITRAMFS)" $(QEMU_ARGS)
