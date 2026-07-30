@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	_ "modernc.org/sqlite"
 
@@ -69,6 +70,7 @@ func newIdentityTestServer(t *testing.T) (pb.IdentityServiceClient, func()) {
 	return client, func() {
 		conn.Close()
 		srv.Shutdown(ctx)
+		db.Close()
 		os.Remove(socketPath)
 	}
 }
@@ -76,7 +78,8 @@ func newIdentityTestServer(t *testing.T) (pb.IdentityServiceClient, func()) {
 func TestIdentityIntegration_HouseholdCRUD(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	h, err := client.CreateHousehold(ctx, &pb.CreateHouseholdRequest{Name: "Test Home"})
 	if err != nil {
@@ -133,7 +136,8 @@ func TestIdentityIntegration_HouseholdCRUD(t *testing.T) {
 func TestIdentityIntegration_ProfileCRUD(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	h, err := client.CreateHousehold(ctx, &pb.CreateHouseholdRequest{Name: "Test"})
 	if err != nil {
@@ -198,12 +202,16 @@ func TestIdentityIntegration_ProfileCRUD(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error after deleting profile")
 	}
+	if status.Code(err) != codes.NotFound {
+		t.Errorf("got code %v, want %v", status.Code(err), codes.NotFound)
+	}
 }
 
 func TestIdentityIntegration_ProfileCascadeDelete(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	h, err := client.CreateHousehold(ctx, &pb.CreateHouseholdRequest{Name: "Test"})
 	if err != nil {
@@ -235,7 +243,8 @@ func TestIdentityIntegration_ProfileCascadeDelete(t *testing.T) {
 func TestIdentityIntegration_CreateProfileDefaultRole(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	h, err := client.CreateHousehold(ctx, &pb.CreateHouseholdRequest{Name: "Test"})
 	if err != nil {
@@ -257,7 +266,8 @@ func TestIdentityIntegration_CreateProfileDefaultRole(t *testing.T) {
 func TestIdentityIntegration_Errors(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	_, err := client.GetHousehold(ctx, &pb.GetHouseholdRequest{HouseholdId: "nonexistent"})
 	if err == nil {
@@ -282,12 +292,16 @@ func TestIdentityIntegration_Errors(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for nonexistent household")
 	}
+	if status.Code(err) != codes.Internal {
+		t.Errorf("got code %v, want %v", status.Code(err), codes.Internal)
+	}
 }
 
 func TestIdentityIntegration_ListEmpty(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	list, err := client.ListHouseholds(ctx, &pb.ListHouseholdsRequest{})
 	if err != nil {
