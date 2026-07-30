@@ -1,0 +1,65 @@
+{
+  // Execution policy for fontis-platform development.
+  // Commands in this file are pre-approved for the agent to run without
+  // additional confirmation. Grouped by purpose.
+  "version": 1,
+  "allowed_commands": [
+    // Build system
+    "make build",
+    "make build-core",
+    "make build-runtime",
+    "make build-hal",
+    "make fmt",
+    "make lint",
+    "make typecheck",
+    "make test-unit",
+    "make test-integration",
+    "make security-scan",
+    "make clean",
+    "make protoc-gen",
+    "make qemu",
+
+    // Go toolchain
+    "go build ./...",
+    "go vet ./...",
+    "go test -count=1 ./...",
+    "go mod tidy",
+    "go mod verify",
+    "go fmt ./...",
+    "go generate ./...",
+
+    // Rust toolchain
+    "cargo build",
+    "cargo check",
+    "cargo test",
+    "cargo clippy",
+    "cargo fmt --check",
+    "cargo doc --no-deps",
+
+    // Git operations (read-only)
+    "git status",
+    "git diff",
+    "git diff --check",
+    "git diff --stat",
+    "git log --oneline",
+    "git log --oneline -10",
+    "git branch",
+    "git show",
+
+    // Proto
+    "protoc --version",
+
+    // Code review
+    "coderabbit review --agent --uncommitted --include-untracked",
+
+    // Validation
+    "git diff --check && make fmt && make lint && make typecheck && make build && make test-unit && make test-integration && make security-scan",
+    "scripts/validate.sh",
+
+    // File operations
+    "mkdir -p",
+    "rm -rf",
+    "cp",
+    "mv"
+  ]
+}

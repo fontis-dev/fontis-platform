@@ -92,3 +92,7 @@ models_cache.json
 # QEMU
 *.ovmf
 *.efi
+
+# Windows reserved device names
+NUL
+NUL.*

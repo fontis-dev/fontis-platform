@@ -47,7 +47,8 @@ For org-wide AI rules, read AI_CONSTITUTION.md from fontis-foundation. For engin
 
 - Prefer running code, tests, linters, and type checks over guessing.
 - Read complete errors, logs, and stack traces before fixing them.
-- Use `rtk` when command output is large or repetitive and a filtered summary is sufficient. Use raw commands when exact output matters.
+- Install RTK (`cargo install --git https://github.com/rtk-ai/rtk`) for command output compression. Use `rtk` when output is large or repetitive and a filtered summary is sufficient. Use raw commands when exact output matters.
+- RTK reduces token consumption by 60-99% on build, test, and lint output. Prefer it for `make lint`, `make build`, `make test-unit`, and `make test-integration` runs.
 
 ## Build system
 
@@ -76,6 +77,30 @@ make clean          # Clean build artifacts
 - Run the full local gate before committing: `git diff --check && make fmt && make lint && make typecheck && make build && make test-unit && make test-integration && make security-scan`
 - Run `scripts/validate.sh` after changing project configuration, build scripts, or CI.
 - For HAL changes affecting real hardware, manual testing on target is required.
+
+## Pull requests
+
+- Use `.github/PULL_REQUEST_TEMPLATE.md` for every PR. Fill in all sections.
+- Before opening a PR, run the CodeRabbit local review as a pre-commit gate:
+  ```bash
+  coderabbit review --agent --uncommitted --include-untracked
+  ```
+  Fix all actionable findings. Document any intentionally skipped items with a reason.
+- After opening a PR, require CI validation, security checks, CodeRabbit review, and at least one independent human review on the latest commit before merging.
+- Every review thread must be resolved or have a documented response.
+- Record manual testing evidence in the PR body. For HAL changes, test on real target hardware. For UI changes, include screenshots.
+
+## Skills
+
+Reusable workflows are in `.agents/skills/`. Each skill has a `SKILL.md` with YAML front matter (`name`, `description`) for auto-discovery:
+
+- `$go-service` — build, test, refactor Go runtime services (gRPC, SQLite, mTLS)
+- `$rust-hal` — develop Rust HAL crate (safety, FFI, error conventions)
+- `$protobuf-contracts` — define, review, regenerate Protobuf schemas and stubs
+- `$pr-readiness` — validate PR merge readiness (CodeRabbit, CI, independent review, manual testing)
+- `$ai-project-manager` — produce requirement-linked plans, pause for approval, execute one phase at a time
+
+Invoke a skill explicitly when needed, or let the agent auto-select based on task description.
 
 ## Documentation routing
 
