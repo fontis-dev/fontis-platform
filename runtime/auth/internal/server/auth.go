@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 	"time"
 
 	pb "github.com/fontis-dev/fontis-platform/runtime/auth/proto"
@@ -25,7 +26,8 @@ func (s *Server) Authenticate(ctx context.Context, req *pb.AuthenticateRequest) 
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, status.Error(codes.PermissionDenied, "invalid credentials")
 		}
-		return nil, status.Errorf(codes.Internal, "verify password: %v", err)
+		log.Printf("verify password error: %v", err)
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 	if !ok {
 		return nil, status.Error(codes.PermissionDenied, "invalid credentials")

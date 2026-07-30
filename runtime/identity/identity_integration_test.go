@@ -26,6 +26,13 @@ import (
 	pb "github.com/fontis-dev/fontis-platform/runtime/identity/proto"
 )
 
+func rpcCtx(t *testing.T) context.Context {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	t.Cleanup(cancel)
+	return ctx
+}
+
 func shortSockPath() string {
 	b := make([]byte, 3)
 	rand.Read(b)
@@ -78,10 +85,8 @@ func newIdentityTestServer(t *testing.T) (pb.IdentityServiceClient, func()) {
 func TestIdentityIntegration_HouseholdCRUD(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 
-	h, err := client.CreateHousehold(ctx, &pb.CreateHouseholdRequest{Name: "Test Home"})
+	h, err := client.CreateHousehold(rpcCtx(t), &pb.CreateHouseholdRequest{Name: "Test Home"})
 	if err != nil {
 		t.Fatalf("CreateHousehold: %v", err)
 	}
@@ -92,7 +97,7 @@ func TestIdentityIntegration_HouseholdCRUD(t *testing.T) {
 		t.Error("expected non-empty household id")
 	}
 
-	got, err := client.GetHousehold(ctx, &pb.GetHouseholdRequest{HouseholdId: h.Household.Id})
+	got, err := client.GetHousehold(rpcCtx(t), &pb.GetHouseholdRequest{HouseholdId: h.Household.Id})
 	if err != nil {
 		t.Fatalf("GetHousehold: %v", err)
 	}
@@ -100,7 +105,7 @@ func TestIdentityIntegration_HouseholdCRUD(t *testing.T) {
 		t.Errorf("got name %q, want %q", got.Household.Name, "Test Home")
 	}
 
-	updated, err := client.UpdateHousehold(ctx, &pb.UpdateHouseholdRequest{
+	updated, err := client.UpdateHousehold(rpcCtx(t), &pb.UpdateHouseholdRequest{
 		HouseholdId: h.Household.Id,
 		Name:        "Updated Home",
 	})
@@ -111,7 +116,7 @@ func TestIdentityIntegration_HouseholdCRUD(t *testing.T) {
 		t.Errorf("got name %q, want %q", updated.Household.Name, "Updated Home")
 	}
 
-	list, err := client.ListHouseholds(ctx, &pb.ListHouseholdsRequest{})
+	list, err := client.ListHouseholds(rpcCtx(t), &pb.ListHouseholdsRequest{})
 	if err != nil {
 		t.Fatalf("ListHouseholds: %v", err)
 	}
@@ -119,12 +124,12 @@ func TestIdentityIntegration_HouseholdCRUD(t *testing.T) {
 		t.Errorf("got %d households, want 1", len(list.Households))
 	}
 
-	_, err = client.DeleteHousehold(ctx, &pb.DeleteHouseholdRequest{HouseholdId: h.Household.Id})
+	_, err = client.DeleteHousehold(rpcCtx(t), &pb.DeleteHouseholdRequest{HouseholdId: h.Household.Id})
 	if err != nil {
 		t.Fatalf("DeleteHousehold: %v", err)
 	}
 
-	_, err = client.GetHousehold(ctx, &pb.GetHouseholdRequest{HouseholdId: h.Household.Id})
+	_, err = client.GetHousehold(rpcCtx(t), &pb.GetHouseholdRequest{HouseholdId: h.Household.Id})
 	if err == nil {
 		t.Fatal("expected error after deleting household")
 	}
@@ -136,15 +141,13 @@ func TestIdentityIntegration_HouseholdCRUD(t *testing.T) {
 func TestIdentityIntegration_ProfileCRUD(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 
-	h, err := client.CreateHousehold(ctx, &pb.CreateHouseholdRequest{Name: "Test"})
+	h, err := client.CreateHousehold(rpcCtx(t), &pb.CreateHouseholdRequest{Name: "Test"})
 	if err != nil {
 		t.Fatalf("CreateHousehold: %v", err)
 	}
 
-	p, err := client.CreateProfile(ctx, &pb.CreateProfileRequest{
+	p, err := client.CreateProfile(rpcCtx(t), &pb.CreateProfileRequest{
 		HouseholdId: h.Household.Id,
 		DisplayName: "Alice",
 		Role:        "admin",
@@ -162,7 +165,7 @@ func TestIdentityIntegration_ProfileCRUD(t *testing.T) {
 		t.Errorf("got household_id %q, want %q", p.Profile.HouseholdId, h.Household.Id)
 	}
 
-	got, err := client.GetProfile(ctx, &pb.GetProfileRequest{ProfileId: p.Profile.Id})
+	got, err := client.GetProfile(rpcCtx(t), &pb.GetProfileRequest{ProfileId: p.Profile.Id})
 	if err != nil {
 		t.Fatalf("GetProfile: %v", err)
 	}
@@ -170,7 +173,7 @@ func TestIdentityIntegration_ProfileCRUD(t *testing.T) {
 		t.Errorf("got display_name %q, want %q", got.Profile.DisplayName, "Alice")
 	}
 
-	updated, err := client.UpdateProfile(ctx, &pb.UpdateProfileRequest{
+	updated, err := client.UpdateProfile(rpcCtx(t), &pb.UpdateProfileRequest{
 		ProfileId:   p.Profile.Id,
 		DisplayName: "Alice Updated",
 		Role:        "member",
@@ -185,7 +188,7 @@ func TestIdentityIntegration_ProfileCRUD(t *testing.T) {
 		t.Errorf("got role %q, want %q", updated.Profile.Role, "member")
 	}
 
-	list, err := client.ListProfiles(ctx, &pb.ListProfilesRequest{HouseholdId: h.Household.Id})
+	list, err := client.ListProfiles(rpcCtx(t), &pb.ListProfilesRequest{HouseholdId: h.Household.Id})
 	if err != nil {
 		t.Fatalf("ListProfiles: %v", err)
 	}
@@ -193,12 +196,12 @@ func TestIdentityIntegration_ProfileCRUD(t *testing.T) {
 		t.Errorf("got %d profiles, want 1", len(list.Profiles))
 	}
 
-	_, err = client.DeleteProfile(ctx, &pb.DeleteProfileRequest{ProfileId: p.Profile.Id})
+	_, err = client.DeleteProfile(rpcCtx(t), &pb.DeleteProfileRequest{ProfileId: p.Profile.Id})
 	if err != nil {
 		t.Fatalf("DeleteProfile: %v", err)
 	}
 
-	_, err = client.GetProfile(ctx, &pb.GetProfileRequest{ProfileId: p.Profile.Id})
+	_, err = client.GetProfile(rpcCtx(t), &pb.GetProfileRequest{ProfileId: p.Profile.Id})
 	if err == nil {
 		t.Fatal("expected error after deleting profile")
 	}
@@ -210,15 +213,13 @@ func TestIdentityIntegration_ProfileCRUD(t *testing.T) {
 func TestIdentityIntegration_ProfileCascadeDelete(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 
-	h, err := client.CreateHousehold(ctx, &pb.CreateHouseholdRequest{Name: "Test"})
+	h, err := client.CreateHousehold(rpcCtx(t), &pb.CreateHouseholdRequest{Name: "Test"})
 	if err != nil {
 		t.Fatalf("CreateHousehold: %v", err)
 	}
 
-	_, err = client.CreateProfile(ctx, &pb.CreateProfileRequest{
+	_, err = client.CreateProfile(rpcCtx(t), &pb.CreateProfileRequest{
 		HouseholdId: h.Household.Id,
 		DisplayName: "Alice",
 	})
@@ -226,12 +227,12 @@ func TestIdentityIntegration_ProfileCascadeDelete(t *testing.T) {
 		t.Fatalf("CreateProfile: %v", err)
 	}
 
-	_, err = client.DeleteHousehold(ctx, &pb.DeleteHouseholdRequest{HouseholdId: h.Household.Id})
+	_, err = client.DeleteHousehold(rpcCtx(t), &pb.DeleteHouseholdRequest{HouseholdId: h.Household.Id})
 	if err != nil {
 		t.Fatalf("DeleteHousehold: %v", err)
 	}
 
-	list, err := client.ListProfiles(ctx, &pb.ListProfilesRequest{HouseholdId: h.Household.Id})
+	list, err := client.ListProfiles(rpcCtx(t), &pb.ListProfilesRequest{HouseholdId: h.Household.Id})
 	if err != nil {
 		t.Fatalf("ListProfiles: %v", err)
 	}
@@ -243,15 +244,13 @@ func TestIdentityIntegration_ProfileCascadeDelete(t *testing.T) {
 func TestIdentityIntegration_CreateProfileDefaultRole(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 
-	h, err := client.CreateHousehold(ctx, &pb.CreateHouseholdRequest{Name: "Test"})
+	h, err := client.CreateHousehold(rpcCtx(t), &pb.CreateHouseholdRequest{Name: "Test"})
 	if err != nil {
 		t.Fatalf("CreateHousehold: %v", err)
 	}
 
-	p, err := client.CreateProfile(ctx, &pb.CreateProfileRequest{
+	p, err := client.CreateProfile(rpcCtx(t), &pb.CreateProfileRequest{
 		HouseholdId: h.Household.Id,
 		DisplayName: "Bob",
 	})
@@ -266,10 +265,8 @@ func TestIdentityIntegration_CreateProfileDefaultRole(t *testing.T) {
 func TestIdentityIntegration_Errors(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 
-	_, err := client.GetHousehold(ctx, &pb.GetHouseholdRequest{HouseholdId: "nonexistent"})
+	_, err := client.GetHousehold(rpcCtx(t), &pb.GetHouseholdRequest{HouseholdId: "nonexistent"})
 	if err == nil {
 		t.Fatal("expected error for nonexistent household")
 	}
@@ -277,7 +274,7 @@ func TestIdentityIntegration_Errors(t *testing.T) {
 		t.Errorf("got code %v, want %v", status.Code(err), codes.NotFound)
 	}
 
-	_, err = client.CreateHousehold(ctx, &pb.CreateHouseholdRequest{Name: ""})
+	_, err = client.CreateHousehold(rpcCtx(t), &pb.CreateHouseholdRequest{Name: ""})
 	if err == nil {
 		t.Fatal("expected error for empty name")
 	}
@@ -285,7 +282,7 @@ func TestIdentityIntegration_Errors(t *testing.T) {
 		t.Errorf("got code %v, want %v", status.Code(err), codes.InvalidArgument)
 	}
 
-	_, err = client.CreateProfile(ctx, &pb.CreateProfileRequest{
+	_, err = client.CreateProfile(rpcCtx(t), &pb.CreateProfileRequest{
 		HouseholdId: "nonexistent",
 		DisplayName: "Alice",
 	})
@@ -300,10 +297,8 @@ func TestIdentityIntegration_Errors(t *testing.T) {
 func TestIdentityIntegration_ListEmpty(t *testing.T) {
 	client, cleanup := newIdentityTestServer(t)
 	defer cleanup()
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 
-	list, err := client.ListHouseholds(ctx, &pb.ListHouseholdsRequest{})
+	list, err := client.ListHouseholds(rpcCtx(t), &pb.ListHouseholdsRequest{})
 	if err != nil {
 		t.Fatalf("ListHouseholds: %v", err)
 	}
