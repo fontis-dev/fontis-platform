@@ -46,7 +46,7 @@ For org-wide AI rules, read AI_CONSTITUTION.md from fontis-foundation. For engin
 ## Workflow (follow in order)
 
 1. **Inspect** — branch, worktree, validation state, TASKS.md status.
-2. **Plan** — map the change to a SPEC.md requirement, break into reviewable items, update TASKS.md.
+2. **Plan** — map the change to a SPEC.md requirement, break into reviewable items.
 3. **Implement one phase** — smallest reviewable increment. Touch only what the task requires.
 4. **Run focused checks** — `go vet ./...` and `go build ./...` and `go test -count=1 ./...` on affected packages.
 5. **Run the full local gate** — `git diff --check && make fmt && make lint && make typecheck && make build && make test-unit && make test-integration && make security-scan`. Fix any failures.
