@@ -7,8 +7,7 @@ SRC_URI = "file://init.sh"
 S = "${WORKDIR}"
 
 do_install() {
-    install -d ${D}/init.d
-    install -m 0755 ${WORKDIR}/init.sh ${D}/init.d/init.sh
+    install -m 0755 ${WORKDIR}/init.sh ${D}/init
 }
 
-FILES:${PN} = "/init.d/init.sh"
+FILES:${PN} = "/init"
