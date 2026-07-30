@@ -8,9 +8,7 @@ This repository contains the Core OS layer and Platform Runtime that execute on 
 
 ```
 core/               Core OS layer
-├── kernel/         Linux kernel configuration
-├── boot/           Bootloader, initramfs, secure boot
-├── packages/       Base system packages and OS image
+├── boot/           Secure boot and key management
 └── hal/            Hardware abstraction layer (Rust)
 
 runtime/            Platform Runtime services (Go)

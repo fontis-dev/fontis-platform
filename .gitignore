@@ -63,7 +63,7 @@ out/
 *.iso
 *.qcow2
 
-# OS image output
+# OS image output (Yocto legacy, retained for safety)
 images/
 
 # Tool caches

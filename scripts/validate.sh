@@ -31,9 +31,7 @@ done
 
 # Verify core/ and runtime/ directory structure exists
 required_dirs=(
-    "core/kernel"
     "core/boot"
-    "core/packages"
     "core/hal"
     "runtime/identity"
     "runtime/auth"

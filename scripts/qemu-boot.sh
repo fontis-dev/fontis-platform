@@ -13,7 +13,7 @@ SMP="${SMP:-2}"
 ACCEL="${ACCEL:-kvm:tcg}"
 
 BUILD_DIR="${BUILD_DIR:-$PROJECT_DIR/build}"
-IMAGE_FILE="${IMAGE_FILE:-$BUILD_DIR/fontis-dev.wic}"
+IMAGE_FILE="${IMAGE_FILE:-$BUILD_DIR/fontis-dev.img}"
 KERNEL="${KERNEL:-}"
 INITRAMFS="${INITRAMFS:-}"
 SECURE_BOOT="${SECURE_BOOT:-false}"
@@ -114,7 +114,7 @@ fi
 # --- Verify image ---
 if [ "$BOOT_MODE" = "image" ] && [ ! -f "$IMAGE_FILE" ]; then
     echo "Error: image not found: $IMAGE_FILE"
-    echo "Build it first with: make build-core"
+    echo "Build it first with: make build-image"
     echo "Or use --kernel and --initramfs for direct kernel boot."
     exit 1
 fi
