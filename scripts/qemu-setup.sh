@@ -80,19 +80,22 @@ echo ""
 echo "swtpm socket: $SWTPM_SOCKET"
 echo "swtpm state:  $SWTPM_STATE"
 
-# --- Generate test keys if missing ---
-SECURE_BOOT_KEYS="${SECURE_BOOT_KEYS:-$PROJECT_DIR/core/boot/secure-boot/keys}"
+# --- Generate test keys if missing and Secure Boot mode is requested ---
+SECURE_BOOT="${SECURE_BOOT:-false}"
+SECURE_BOOT_KEYS="${SECURE_BOOT_KEYS:-$HOME/.cache/fontis/secure-boot-keys}"
 
-if [ ! -f "$SECURE_BOOT_KEYS/db.key" ]; then
-    if command -v "$PROJECT_DIR/core/boot/secure-boot/gen-keys.sh" &>/dev/null; then
+if [ "$SECURE_BOOT" = "true" ]; then
+    if [ ! -f "$SECURE_BOOT_KEYS/db.key" ]; then
+        if [ -f "$PROJECT_DIR/core/boot/secure-boot/gen-keys.sh" ]; then
+            echo ""
+            echo "Secure Boot keys not found. Generating development keys..."
+            mkdir -p "$SECURE_BOOT_KEYS"
+            "$PROJECT_DIR/core/boot/secure-boot/gen-keys.sh" "$SECURE_BOOT_KEYS"
+        fi
+    else
         echo ""
-        echo "Secure Boot keys not found. Generating development keys..."
-        mkdir -p "$SECURE_BOOT_KEYS"
-        "$PROJECT_DIR/core/boot/secure-boot/gen-keys.sh" "$SECURE_BOOT_KEYS"
+        echo "Secure Boot keys: $SECURE_BOOT_KEYS (existing)"
     fi
-else
-    echo ""
-    echo "Secure Boot keys: $SECURE_BOOT_KEYS (existing)"
 fi
 
 echo ""

@@ -68,7 +68,7 @@ For org-wide AI rules, read AI_CONSTITUTION.md from fontis-foundation. For engin
 make build          # Build runtime services and HAL
 make build-runtime  # Build all runtime Go services
 make build-hal      # Build Rust HAL crate
-make build-image    # Build Debian-based core OS image
+make build-image    # Build Debian-based core OS image (planned, not yet implemented)
 make fmt            # Format all code
 make lint           # Lint all code
 make typecheck      # Type-check (Go, Rust)
@@ -90,7 +90,7 @@ make clean          # Clean build artifacts
 ## Validation
 
 - Run the full local gate before committing: `git diff --check && make fmt && make lint && make typecheck && make build && make test-unit && make test-integration && make security-scan`
-- Run `make build-image` after changing image configuration or base OS packages.
+- Run `make build-image` after changing image configuration or base OS packages (once the target is implemented).
 - For HAL changes affecting real hardware, manual testing on target is required.
 
 ## Pull requests

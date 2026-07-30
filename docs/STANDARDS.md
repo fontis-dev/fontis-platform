@@ -154,7 +154,7 @@ The root `Makefile` is the single entry point for all build operations. Standard
 | `build` | Build runtime services and HAL |
 | `build-runtime` | Build all runtime Go services |
 | `build-hal` | Build Rust HAL crate |
-| `build-image` | Build Debian-based core OS image |
+| `build-image` | Build Debian-based core OS image (planned, not yet implemented) |
 | `fmt` | Format all code |
 | `lint` | Lint all code |
 | `typecheck` | Type-check all code |

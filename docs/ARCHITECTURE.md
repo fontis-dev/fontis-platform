@@ -263,7 +263,7 @@ Multi-monitor support is deferred to a future version.
 make build                    # Build runtime services and HAL
 make build-runtime            # Build runtime Go services
 make build-hal                # Build Rust HAL crate
-make build-image              # Build Debian-based core OS image
+make build-image              # Build Debian-based core OS image (planned, not yet implemented)
 ```
 
 ### Running in Emulation
