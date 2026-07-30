@@ -6,9 +6,9 @@
 
 - [x] Create Makefile with targets: build, fmt, lint, typecheck, test-unit, test-integration, security-scan, clean.
 - [x] Set up Yocto layer structure for core OS image (structure created, CodeRabbit-reviewed; full build validation requires a Linux Yocto build environment, see `make build-core`).
-- [ ] Configure Linux kernel with required drivers (storage, networking, TPM, UEFI) and security features (SELinux/AppArmor, integrity subsystem, dm-crypt, dm-verity).
-- [ ] Add GPU drivers to kernel config (i915, amdgpu, dummy) for DRM/KMS support.
-- [ ] Add evdev and ALSA drivers to kernel config for input and audio.
+- [x] Configure Linux kernel with required drivers (storage, networking, TPM, UEFI) and security features (SELinux/AppArmor, integrity subsystem, dm-crypt, dm-verity).
+- [x] Add GPU drivers to kernel config (i915, amdgpu, dummy) for DRM/KMS support.
+- [x] Add evdev and ALSA drivers to kernel config for input and audio.
 - [x] Set up Rust toolchain and project structure for `core/hal/`.
 - [x] Set up Go toolchain and project structure for `runtime/` services.
 - [x] Create CI pipeline (`.github/workflows/ci.yml`) with build, lint, test jobs.
