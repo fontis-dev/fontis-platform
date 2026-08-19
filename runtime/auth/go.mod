@@ -6,7 +6,7 @@ require (
 	github.com/fontis-dev/fontis-platform/runtime/pkg/tls v0.0.0-00010101000000-000000000000
 	golang.org/x/crypto v0.54.0
 	google.golang.org/grpc v1.82.1
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/protobuf v1.36.12
 	modernc.org/sqlite v1.55.0
 )
 
