@@ -33,7 +33,7 @@ jobs:
           gofmt -l runtime/ 2>&1 | tee /dev/stderr
           if [ -s /dev/stderr ]; then exit 1; fi
       - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
           toolchain: ${{ env.RUST_VERSION }}
           components: rustfmt
@@ -60,7 +60,7 @@ jobs:
             fi
           done
       - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
           toolchain: ${{ env.RUST_VERSION }}
           components: clippy
@@ -106,7 +106,7 @@ jobs:
             fi
           done
       - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
           toolchain: ${{ env.RUST_VERSION }}
       - name: Build HAL
@@ -129,7 +129,7 @@ jobs:
             fi
           done
       - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
           toolchain: ${{ env.RUST_VERSION }}
       - name: Run Rust tests
@@ -155,7 +155,7 @@ jobs:
             fi
           done
       - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
           toolchain: ${{ env.RUST_VERSION }}
       - name: Run cargo-audit
